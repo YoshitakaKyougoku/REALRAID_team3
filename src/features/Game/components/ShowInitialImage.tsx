@@ -66,8 +66,7 @@ export default function ShowInitialImage() {
 
   return (
     <div className="container">
-      <div className="generate-form">
-      </div>
+      <div className="generate-form"></div>
       {error && (
         <div className="error-message">
           <pre>{error}</pre>
