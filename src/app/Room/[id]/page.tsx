@@ -1,47 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
-  const [roomId, setRoomId] = useState("");
+export default function Room({ params }: { params: any }) {
   const router = useRouter();
+  const roomId = params.id;
+  const [users, setUsers] = useState<number[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const ws = useRef<WebSocket | null>(null);
 
-  const createRoom = () => {
-    const newRoomId = Math.random().toString(36).substring(2, 7);
-    router.push(`/room/${newRoomId}`);
-  };
+  useEffect(() => {
+    if (!roomId) return;
 
-  const joinRoom = () => {
-    if (roomId) {
-      router.push(`/room/${roomId}`);
-    }
-  };
+    ws.current = new WebSocket("ws://localhost:3001");
+    ws.current.onopen = () => {
+      ws.current?.send(
+        JSON.stringify({ type: "join", payload: { room: roomId } })
+      );
+    };
+
+    ws.current.onmessage = (message) => {
+      const parsedMessage = JSON.parse(message.data);
+      if (parsedMessage.type === "userList") {
+        setUsers(parsedMessage.payload);
+      } else if (parsedMessage.type === "startGame") {
+        router.push(`/game/${roomId}`);
+      } else if (parsedMessage.type === "error") {
+        setError(parsedMessage.payload);
+      }
+    };
+
+    return () => {
+      ws.current?.close();
+    };
+  }, [roomId]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-4xl font-bold mb-4">伝言ゲーム</h1>
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded shadow"
-        onClick={createRoom}
-      >
-        ルームを作成
-      </button>
-      <div className="flex space-x-2">
-        <input
-          type="text"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
-          placeholder="ルームIDを入力"
-          className="border px-2 py-1 rounded"
-        />
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded shadow"
-          onClick={joinRoom}
-        >
-          ルームに入る
-        </button>
-      </div>
+      <h1 className="text-2xl font-bold">ルームID: {roomId}</h1>
+      {error && <div className="text-red-500">{error}</div>}
+      <div className="text-lg">参加者: {users.join(", ")}</div>
+      {users.length < 4 && (
+        <div className="text-gray-500">他のプレイヤーを待っています...</div>
+      )}
     </div>
   );
 }
