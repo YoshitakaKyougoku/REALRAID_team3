@@ -4,66 +4,66 @@ const { createServer } = require("http");
 const server = createServer();
 const wss = new WebSocketServer({ server });
 
-const rooms = {};
+const lobbies = {};
 const MAX_USERS = 4;
 
 wss.on("connection", (ws) => {
-  let currentRoom = null;
+  let currentLobby = null;
   let userNumber = null;
 
   ws.on("message", (message) => {
     const parsedMessage = JSON.parse(message.toString());
 
     if (parsedMessage.type === "join") {
-      currentRoom = parsedMessage.payload.room;
-      if (!rooms[currentRoom]) {
-        rooms[currentRoom] = {
+      currentLobby = parsedMessage.payload.lobby;
+      if (!lobbies[currentLobby]) {
+        lobbies[currentLobby] = {
           clients: [],
           currentTurn: 0,
           originalMessage: "",
           lastMessage: "",
         };
       }
-      if (rooms[currentRoom].clients.length >= MAX_USERS) {
+      if (lobbies[currentLobby].clients.length >= MAX_USERS) {
         ws.send(
-          JSON.stringify({ type: "error", payload: "ルームは満員です。" })
+          JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
         );
         return;
       }
-      userNumber = rooms[currentRoom].clients.length + 1;
-      rooms[currentRoom].clients.push({ ws, userNumber });
+      userNumber = lobbies[currentLobby].clients.length + 1;
+      lobbies[currentLobby].clients.push({ ws, userNumber });
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
-      const users = rooms[currentRoom].clients.map(
+      const users = lobbies[currentLobby].clients.map(
         (client) => client.userNumber
       );
-      rooms[currentRoom].clients.forEach((client) => {
+      lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
-      if (rooms[currentRoom].clients.length === MAX_USERS) {
-        rooms[currentRoom].clients.forEach((client) => {
-          client.ws.send(JSON.stringify({ type: "startGame" }));
+      if (lobbies[currentLobby].clients.length === MAX_USERS) {
+        lobbies[currentLobby].clients.forEach((client) => {
+          client.ws.send(JSON.stringify({ type: "playing" }));
         });
         // プレイヤー1のターンを最初に設定
-        rooms[currentRoom].clients[0].ws.send(
+        lobbies[currentLobby].clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
       }
-    } else if (parsedMessage.type === "message" && currentRoom) {
-      const room = rooms[currentRoom];
-      const currentClient = room.clients[room.currentTurn];
+    } else if (parsedMessage.type === "message" && currentLobby) {
+      const lobby = lobbies[currentLobby];
+      const currentClient = lobby.clients[lobby.currentTurn];
       if (currentClient.ws === ws) {
-        if (room.currentTurn === 0) {
-          room.originalMessage = parsedMessage.payload;
+        if (lobby.currentTurn === 0) {
+          lobby.originalMessage = parsedMessage.payload;
         }
-        room.lastMessage = parsedMessage.payload;
+        lobby.lastMessage = parsedMessage.payload;
 
-        room.currentTurn = (room.currentTurn + 1) % room.clients.length;
+        lobby.currentTurn = (lobby.currentTurn + 1) % lobby.clients.length;
 
-        if (room.currentTurn === 0) {
-          const isCorrect = room.lastMessage === room.originalMessage;
-          room.clients.forEach((client) => {
+        if (lobby.currentTurn === 0) {
+          const isCorrect = lobby.lastMessage === lobby.originalMessage;
+          lobby.clients.forEach((client) => {
             client.ws.send(
               JSON.stringify({
                 type: "result",
@@ -72,12 +72,12 @@ wss.on("connection", (ws) => {
             );
           });
         } else {
-          const nextClient = room.clients[room.currentTurn];
+          const nextClient = lobby.clients[lobby.currentTurn];
           nextClient.ws.send(JSON.stringify({ type: "turn", payload: true }));
           nextClient.ws.send(
             JSON.stringify({
               type: "previousMessage",
-              payload: room.lastMessage,
+              payload: lobby.lastMessage,
             })
           );
         }
@@ -86,12 +86,12 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    if (currentRoom && rooms[currentRoom]) {
-      rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
+    if (currentLobby && lobbies[currentLobby]) {
+      lobbies[currentLobby].clients = lobbies[currentLobby].clients.filter(
         (client) => client.ws !== ws
       );
-      if (rooms[currentRoom].clients.length === 0) {
-        delete rooms[currentRoom];
+      if (lobbies[currentLobby].clients.length === 0) {
+        delete lobbies[currentLobby];
       }
     }
   });

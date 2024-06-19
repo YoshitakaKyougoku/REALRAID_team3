@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import AnswerInput from "@/features/play/components/AnswerInput";
 
 export default function Play({ params }: { params: any }) {
-  // const router = useRouter();
-  const roomId = params.id;
+  const router = useRouter();
+  const lobbyId = params.id;
   const [input, setInput] = useState("");
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
@@ -15,12 +15,12 @@ export default function Play({ params }: { params: any }) {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    if (!roomId) return;
+    if (!lobbyId) return;
 
     ws.current = new WebSocket("ws://localhost:3001");
     ws.current.onopen = () => {
       ws.current?.send(
-        JSON.stringify({ type: "join", payload: { room: roomId } })
+        JSON.stringify({ type: "join", payload: { lobby: lobbyId } })
       );
     };
 
@@ -41,7 +41,7 @@ export default function Play({ params }: { params: any }) {
     return () => {
       ws.current?.close();
     };
-  }, [roomId]);
+  }, [lobbyId]);
 
   const sendMessage = () => {
     if (ws.current && input && isMyTurn) {
