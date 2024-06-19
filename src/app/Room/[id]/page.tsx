@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function Room({ params }: { params: any }) {
   const router = useRouter();
   const roomId = params.id;
+  console.log(roomId);
   const [users, setUsers] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
@@ -22,6 +23,7 @@ export default function Room({ params }: { params: any }) {
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
+      console.log(parsedMessage);
       if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
       } else if (parsedMessage.type === "startGame") {
