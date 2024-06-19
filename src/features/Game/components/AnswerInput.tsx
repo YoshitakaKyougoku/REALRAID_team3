@@ -6,7 +6,7 @@ type AnswerInputProps = {
   onSend: () => void;
 };
 
-const AnswerInput = ({ input,setInput, onSend}: AnswerInputProps) => {
+const AnswerInput = ({ input, setInput, onSend }: AnswerInputProps) => {
   return (
     <div>
       <input
@@ -15,11 +15,7 @@ const AnswerInput = ({ input,setInput, onSend}: AnswerInputProps) => {
         onChange={(e) => setInput(e.target.value)}
         placeholder="メッセージを入力"
       />
-      <button
-        onClick={onSend}
-      >
-        送信
-      </button>
+      <button onClick={onSend}>送信</button>
     </div>
   );
 };

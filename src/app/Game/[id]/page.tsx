@@ -69,11 +69,7 @@ export default function Game({ params }: { params: any }) {
         <div className="text-lg">前のメッセージ: {previousMessage}</div>
       )}
       {isMyTurn ? (
-        <AnswerInput
-        input={input}
-        setInput={setInput}
-        onSend={sendMessage}
-      />
+        <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
       ) : (
         <div className="text-gray-500">他のプレイヤーが操作中</div>
       )}
