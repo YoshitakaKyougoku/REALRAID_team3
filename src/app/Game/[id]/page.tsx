@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import AnswerInput from "@/features/game/components/AnswerInput";
 
 export default function Game({ params }: { params: any }) {
-  const router = useRouter();
+  // const router = useRouter();
   const roomId = params.id;
   const [input, setInput] = useState("");
   const [userNumber, setUserNumber] = useState<number | null>(null);
@@ -29,6 +30,7 @@ export default function Game({ params }: { params: any }) {
         setUserNumber(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
+        setInput(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(true);
       } else if (parsedMessage.type === "result") {
@@ -67,21 +69,11 @@ export default function Game({ params }: { params: any }) {
         <div className="text-lg">前のメッセージ: {previousMessage}</div>
       )}
       {isMyTurn ? (
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="メッセージを入力"
-            className="border px-2 py-1 rounded"
-          />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded shadow"
-            onClick={sendMessage}
-          >
-            送信
-          </button>
-        </div>
+        <AnswerInput
+        input={input}
+        setInput={setInput}
+        onSend={sendMessage}
+      />
       ) : (
         <div className="text-gray-500">他のプレイヤーが操作中</div>
       )}
