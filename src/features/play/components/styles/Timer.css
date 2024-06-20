@@ -1,0 +1,28 @@
+.progress {
+  height: 30px;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 1s linear;
+}
+
+.progress-bar-info {
+  background-color: #5bc0de;
+}
+
+.progress-bar-warning {
+  background-color: #f0ad4e;
+}
+
+.progress-bar-danger {
+  background-color: #d9534f;
+}
+
+.text-danger {
+  color: #d9534f;
+}

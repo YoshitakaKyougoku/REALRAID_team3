@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import AnswerInput from "@/features/play/components/AnswerInput";
+import Timer from "@/features/play/components/Timer";
 
 export default function Play({ params }: { params: any }) {
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function Play({ params }: { params: any }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-2xl font-bold">ゲーム画面</h1>
+      <Timer totalTime={60} />
       {userNumber !== null && (
         <div className="text-lg">あなたの番号: {userNumber}</div>
       )}
