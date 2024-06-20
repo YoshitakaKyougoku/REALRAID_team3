@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../styles/Timer.css";
+import { PlayContext } from "@/app/play/[id]/page";
 
 interface TimerProps {
   totalTime: number;
 }
 
 const Timer: React.FC<TimerProps> = ({ totalTime }) => {
+  const { isMyTurn, setIsMyTurn, sendMessage } = useContext(PlayContext);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(
@@ -13,26 +15,40 @@ const Timer: React.FC<TimerProps> = ({ totalTime }) => {
   );
 
   useEffect(() => {
+    // 残り時間をリセット
+    setTimeLeft(totalTime);
+    setProgressWidth(100);
+    setProgressBarClass("progress-bar progress-bar-info");
+  }, [isMyTurn, totalTime]);
+
+  useEffect(() => {
     if (timeLeft <= 0) {
+      sendMessage();
+      setIsMyTurn(false); // ターンが終わるのでフラグを下げる
       return;
     }
 
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
-      const newWidth = (timeLeft - 1) * (100 / totalTime);
-      setProgressWidth(newWidth);
+      setTimeLeft((prevTime) => {
+        const newTime = prevTime - 1;
+        const newWidth = (newTime / totalTime) * 100;
 
-      if (newWidth < 20) {
-        setProgressBarClass("progress-bar progress-bar-danger");
-      } else if (newWidth < 50) {
-        setProgressBarClass("progress-bar progress-bar-warning");
-      } else {
-        setProgressBarClass("progress-bar progress-bar-info");
-      }
+        setProgressWidth(newWidth);
+
+        if (newWidth < 20) {
+          setProgressBarClass("progress-bar progress-bar-danger");
+        } else if (newWidth < 50) {
+          setProgressBarClass("progress-bar progress-bar-warning");
+        } else {
+          setProgressBarClass("progress-bar progress-bar-info");
+        }
+
+        return newTime;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, totalTime]);
+  }, [timeLeft, totalTime, setIsMyTurn, sendMessage]);
 
   return (
     <div>
