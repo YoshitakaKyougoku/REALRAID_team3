@@ -83,7 +83,7 @@ export default function Play({ params }: { params: any }) {
   return (
     <PlayContext.Provider value={{ isMyTurn, setIsMyTurn, sendMessage }}>
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        {isMyTurn && <Timer totalTime={10} />}
+        {isMyTurn && <Timer totalTime={600} />}
         {userNumber !== null && (
           <div className="text-lg">あなたの番号: {userNumber}</div>
         )}

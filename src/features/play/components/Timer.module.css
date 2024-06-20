@@ -1,28 +1,37 @@
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
 .progress {
+  width: 80%;
   height: 30px;
+  margin: 10px auto;
   background-color: #f3f3f3;
-  border-radius: 5px;
+  border-radius: 10px;
   overflow: hidden;
   margin-top: 10px;
 }
 
-.progress-bar {
+.progressBar {
   height: 100%;
   transition: width 1s linear;
 }
 
-.progress-bar-info {
+.progressBarInfo {
   background-color: #5bc0de;
 }
 
-.progress-bar-warning {
+.progressBarWarning {
   background-color: #f0ad4e;
 }
 
-.progress-bar-danger {
+.progressBarDanger {
   background-color: #d9534f;
 }
 
-.text-danger {
+.textDanger {
   color: #d9534f;
 }
