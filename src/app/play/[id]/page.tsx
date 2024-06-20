@@ -10,6 +10,7 @@ import {
 } from "react";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
+import Waiting from "@/features/play/components/Waiting";
 
 export const PlayContext = createContext<{
   isMyTurn: boolean;
@@ -93,7 +94,8 @@ export default function Play({ params }: { params: any }) {
         {isMyTurn ? (
           <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
         ) : (
-          <div className="text-gray-500">他のプレイヤーが操作中</div>
+          // Todo : 他のプレイヤーが操作中の画面の作成
+          <Waiting />
         )}
       </div>
     </PlayContext.Provider>
