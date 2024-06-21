@@ -1,13 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createContext } from "react";
 import { useRouter } from "next/navigation";
+import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
+import Error from "@/features/play/components/Error";
+
+export const LobbyContext = createContext<{
+  userNumber: number | null;
+  users: number[];
+}>(
+  {} as {
+    userNumber: number | null;
+    users: number[];
+  }
+);
 
 export default function Lobby({ params }: { params: any }) {
   const router = useRouter();
   const lobbyId = params.id;
   console.log(lobbyId);
   const [users, setUsers] = useState<number[]>([]);
+  const [userNumber, setUserNumber] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
 
@@ -24,7 +37,9 @@ export default function Lobby({ params }: { params: any }) {
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
       console.log(parsedMessage);
-      if (parsedMessage.type === "userList") {
+      if (parsedMessage.type === "number") {
+        setUserNumber(parsedMessage.payload);
+      } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
       } else if (parsedMessage.type === "playing") {
         router.push(`/play/${lobbyId}`);
@@ -36,16 +51,17 @@ export default function Lobby({ params }: { params: any }) {
     return () => {
       ws.current?.close();
     };
-  }, [lobbyId]);
+  }, [lobbyId, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-2xl font-bold">ロビーID: {lobbyId}</h1>
-      {error && <div className="text-red-500">{error}</div>}
-      <div className="text-lg">参加者: {users.join(", ")}</div>
-      {users.length < 4 && (
-        <div className="text-gray-500">他のプレイヤーを待っています...</div>
-      )}
-    </div>
+    <LobbyContext.Provider value={{ userNumber, users }}>
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        {error ? (
+          <Error error={error} />
+        ) : (
+          <ShowCurrentPlayer lobbyId={lobbyId} />
+        )}
+      </div>
+    </LobbyContext.Provider>
   );
 }

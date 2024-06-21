@@ -1,11 +1,31 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useState,
+  useEffect,
+  useRef,
+  createContext,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import Image from "next/image";
 import AnswerInput from "@/features/play/components/AnswerInput";
+import Timer from "@/features/play/components/Timer";
+import Waiting from "@/features/play/components/Waiting";
+import Link from "next/link";
+
+export const PlayContext = createContext<{
+  isMyTurn: boolean;
+  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+  sendMessage: () => void;
+}>(
+  {} as {
+    isMyTurn: boolean;
+    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+    sendMessage: () => void;
+  }
+);
 
 export default function Play({ params }: { params: any }) {
-  const router = useRouter();
   const lobbyId = params.id;
   const [input, setInput] = useState("");
   const [userNumber, setUserNumber] = useState<number | null>(null);
@@ -20,7 +40,7 @@ export default function Play({ params }: { params: any }) {
   const connectWebSocket = () => {
     if (!lobbyId) return;
 
-    console.log("start");
+    // websocketに接続
     ws.current = new WebSocket("ws://localhost:3001");
 
     ws.current.onopen = () => {
@@ -34,12 +54,14 @@ export default function Play({ params }: { params: any }) {
       const parsedMessage = JSON.parse(message.data);
       if (parsedMessage.type === "number") {
         setUserNumber(parsedMessage.payload);
+        console.log("Set user number:", parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
         setInput(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(true);
       } else if (parsedMessage.type === "result") {
+        // 結果を表示
         setResult(parsedMessage.payload ? "正解！" : "不正解！");
       } else if (parsedMessage.type === "initialImage") {
         setInitialImage(parsedMessage.payload);
@@ -87,6 +109,7 @@ export default function Play({ params }: { params: any }) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
+        <Link href="/">トップに戻る</Link>
         <p>お題</p>
         <figure>
           <Image
@@ -110,28 +133,29 @@ export default function Play({ params }: { params: any }) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-2xl font-bold">ゲーム画面</h1>
-      {userNumber !== null && (
-        <div className="text-lg">あなたの番号: {userNumber}</div>
-      )}
-      {initialImage ? (
-        <div className="generated-image-area">
-          <p>お題</p>
-          <figure>
-            <Image
-              src={`data:image/png;base64,${initialImage}`}
-              alt="Received Data"
-              width={512}
-              height={512}
-            />
-          </figure>
-        </div>
-      ) : (
-        <div>画像を読み込み中...</div>
-      )}
-      {previousMessage ? (
-        <>
+    <PlayContext.Provider value={{ isMyTurn, setIsMyTurn, sendMessage }}>
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        {isMyTurn && <Timer totalTime={600} />}
+        {userNumber !== null && (
+          <div className="text-lg">あなたの番号: {userNumber}</div>
+        )}
+        {initialImage ? (
+          <div className="generated-image-area">
+            <p>お題</p>
+            <figure>
+              <Image
+                src={`data:image/png;base64,${initialImage}`}
+                alt="Received Data"
+                width={512}
+                height={512}
+              />
+            </figure>
+          </div>
+        ) : (
+          <div>画像を読み込み中...</div>
+        )}
+        {previousMessage && (
+          <>
           <div className="text-lg">前のメッセージ: {previousMessage}</div>
           <figure>
             <Image
@@ -142,14 +166,14 @@ export default function Play({ params }: { params: any }) {
             />
           </figure>
         </>
-      ) : (
-        <div>画像を読み込み中...</div>
-      )}
-      {isMyTurn ? (
-        <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
-      ) : (
-        <div className="text-gray-500">他のプレイヤーが操作中</div>
-      )}
-    </div>
+        )}
+        {isMyTurn ? (
+          <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
+        ) : (
+          // Todo : 他のプレイヤーが操作中の画面の作成
+          <Waiting />
+        )}
+      </div>
+    </PlayContext.Provider>
   );
 }
