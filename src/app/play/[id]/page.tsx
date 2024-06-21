@@ -11,6 +11,7 @@ import {
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
+import Link from "next/link";
 
 export const PlayContext = createContext<{
   isMyTurn: boolean;
@@ -77,6 +78,7 @@ export default function Play({ params }: { params: any }) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
+        <Link href="/">トップに戻る</Link>
       </div>
     );
   }
