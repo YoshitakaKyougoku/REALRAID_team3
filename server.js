@@ -1,5 +1,6 @@
 const { WebSocketServer, WebSocket } = require("ws");
 const { createServer } = require("http");
+const { generateImage } = require("./imageGenerator");
 
 const server = createServer();
 const wss = new WebSocketServer({ server });
@@ -7,11 +8,19 @@ const wss = new WebSocketServer({ server });
 const lobbies = {};
 const MAX_USERS = 4;
 
+server.on("error", (error) => {
+  console.error("HTTP server error:", error);
+});
+
+wss.on("error", (error) => {
+  console.error("WebSocket server error:", error);
+});
+
 wss.on("connection", (ws) => {
   let currentLobby = null;
   let userNumber = null;
 
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     const parsedMessage = JSON.parse(message.toString());
 
     if (parsedMessage.type === "join") {
@@ -42,13 +51,28 @@ wss.on("connection", (ws) => {
       });
 
       if (lobbies[currentLobby].clients.length === MAX_USERS) {
-        lobbies[currentLobby].clients.forEach((client) => {
-          client.ws.send(JSON.stringify({ type: "playing" }));
-        });
-        // プレイヤー1のターンを最初に設定
-        lobbies[currentLobby].clients[0].ws.send(
-          JSON.stringify({ type: "turn", payload: true })
-        );
+        try {
+          const imageData = await generateImage("girl");
+          lobbies[currentLobby].clients.forEach((client) => {
+            client.ws.send(
+              JSON.stringify({ type: "initialImage", payload: imageData })
+            );
+            client.ws.send(JSON.stringify({ type: "playing" }));
+          });
+          // プレイヤー1のターンを最初に設定
+          lobbies[currentLobby].clients[0].ws.send(
+            JSON.stringify({ type: "turn", payload: true })
+          );
+        } catch (error) {
+          lobbies[currentLobby].clients.forEach((client) => {
+            client.ws.send(
+              JSON.stringify({
+                type: "error",
+                payload: "画像の生成に失敗しました。",
+              })
+            );
+          });
+        }
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
@@ -61,23 +85,43 @@ wss.on("connection", (ws) => {
 
         lobby.currentTurn = (lobby.currentTurn + 1) % lobby.clients.length;
 
-        if (lobby.currentTurn === 0) {
-          const isCorrect = lobby.lastMessage === lobby.originalMessage;
-          lobby.clients.forEach((client) => {
-            client.ws.send(
+        try {
+          const imageData = await generateImage(lobby.lastMessage);
+
+          if (lobby.currentTurn === 0) {
+            const isCorrect = lobby.lastMessage === lobby.originalMessage;
+            lobby.clients.forEach((client) => {
+              client.ws.send(
+                JSON.stringify({
+                  type: "result",
+                  payload: isCorrect,
+                })
+              );
+              client.ws.send(
+                JSON.stringify({
+                  type: "generatedImage",
+                  payload: imageData,
+                })
+              );
+            });
+          } else {
+            const nextClient = lobby.clients[lobby.currentTurn];
+            nextClient.ws.send(
+              JSON.stringify({ type: "generatedImage", payload: imageData })
+            );
+            nextClient.ws.send(JSON.stringify({ type: "turn", payload: true }));
+            nextClient.ws.send(
               JSON.stringify({
-                type: "result",
-                payload: isCorrect,
+                type: "previousMessage",
+                payload: lobby.lastMessage,
               })
             );
-          });
-        } else {
-          const nextClient = lobby.clients[lobby.currentTurn];
-          nextClient.ws.send(JSON.stringify({ type: "turn", payload: true }));
-          nextClient.ws.send(
+          }
+        } catch (error) {
+          ws.send(
             JSON.stringify({
-              type: "previousMessage",
-              payload: lobby.lastMessage,
+              type: "error",
+              payload: "画像の生成に失敗しました。",
             })
           );
         }

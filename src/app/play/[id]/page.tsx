@@ -1,7 +1,7 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import AnswerInput from "@/features/play/components/AnswerInput";
 
 export default function Play({ params }: { params: any }) {
@@ -12,13 +12,19 @@ export default function Play({ params }: { params: any }) {
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [initialImage, setInitialImage] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
+  const retryTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
+  const connectWebSocket = () => {
     if (!lobbyId) return;
 
+    console.log("start");
     ws.current = new WebSocket("ws://localhost:3001");
+
     ws.current.onopen = () => {
+      console.log("WebSocket connection opened");
       ws.current?.send(
         JSON.stringify({ type: "join", payload: { lobby: lobbyId } })
       );
@@ -35,10 +41,36 @@ export default function Play({ params }: { params: any }) {
         setIsMyTurn(true);
       } else if (parsedMessage.type === "result") {
         setResult(parsedMessage.payload ? "正解！" : "不正解！");
+      } else if (parsedMessage.type === "initialImage") {
+        setInitialImage(parsedMessage.payload);
+      } else if (parsedMessage.type === "generatedImage") {
+        setGeneratedImage(parsedMessage.payload);
       }
     };
 
+    ws.current.onclose = () => {
+      console.log("WebSocket connection closed, retrying...");
+      retryWebSocketConnection();
+    };
+
+    ws.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      ws.current?.close();
+    };
+  };
+
+  const retryWebSocketConnection = () => {
+    if (retryTimeout.current) clearTimeout(retryTimeout.current);
+    retryTimeout.current = setTimeout(() => {
+      connectWebSocket();
+    }, 3000); // 3秒後に再接続を試みる
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+
     return () => {
+      if (retryTimeout.current) clearTimeout(retryTimeout.current);
       ws.current?.close();
     };
   }, [lobbyId]);
@@ -55,6 +87,24 @@ export default function Play({ params }: { params: any }) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
+        <p>お題</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${initialImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
+        <p>生成された画像</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${generatedImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
       </div>
     );
   }
@@ -65,8 +115,35 @@ export default function Play({ params }: { params: any }) {
       {userNumber !== null && (
         <div className="text-lg">あなたの番号: {userNumber}</div>
       )}
-      {previousMessage && (
-        <div className="text-lg">前のメッセージ: {previousMessage}</div>
+      {initialImage ? (
+        <div className="generated-image-area">
+          <p>お題</p>
+          <figure>
+            <Image
+              src={`data:image/png;base64,${initialImage}`}
+              alt="Received Data"
+              width={512}
+              height={512}
+            />
+          </figure>
+        </div>
+      ) : (
+        <div>画像を読み込み中...</div>
+      )}
+      {previousMessage ? (
+        <>
+          <div className="text-lg">前のメッセージ: {previousMessage}</div>
+          <figure>
+            <Image
+              src={`data:image/png;base64,${generatedImage}`}
+              alt="Received Data"
+              width={512}
+              height={512}
+            />
+          </figure>
+        </>
+      ) : (
+        <div>画像を読み込み中...</div>
       )}
       {isMyTurn ? (
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
