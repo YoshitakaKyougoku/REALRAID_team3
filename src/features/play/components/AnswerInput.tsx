@@ -9,8 +9,7 @@ type AnswerInputProps = {
 const AnswerInput = ({ input, setInput, onSend }: AnswerInputProps) => {
   return (
     <div>
-      <input
-        type="text"
+      <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="メッセージを入力"
