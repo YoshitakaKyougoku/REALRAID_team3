@@ -1,22 +1,40 @@
+import React from "react";
+
 interface ShowCurrentPlayerProps {
   lobbyId: string;
   users: string[];
   userNumber: number | null;
+  isHost: boolean;
+  startGame: () => void;
 }
 
-export default function ShowCurrentPlayer({
+const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
   lobbyId,
   users,
   userNumber,
-}: ShowCurrentPlayerProps) {
+  isHost,
+  startGame,
+}) => {
   return (
     <div>
-      <h1 className="text-2xl font-bold">ロビーID: {lobbyId}</h1>
-      <div className="text-lg">参加者: {users.join(", ")}</div>
-      <div className="text-lg">現在のプレイヤー: {userNumber}</div>
-      {users.length < 4 && (
-        <div className="text-gray-500">他のプレイヤーを待っています...</div>
+      <h2>ロビーID: {lobbyId}</h2>
+      <h3>参加者:</h3>
+      <ul>
+        {users.map((user, index) => (
+          <li key={index}>{user}</li>
+        ))}
+      </ul>
+      <p>あなたの番号: {userNumber}</p>
+      {isHost && (
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={startGame}
+        >
+          ゲーム開始
+        </button>
       )}
     </div>
   );
-}
+};
+
+export default ShowCurrentPlayer;

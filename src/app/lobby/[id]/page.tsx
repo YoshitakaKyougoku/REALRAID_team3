@@ -35,14 +35,10 @@ export const LobbyContext = createContext<{
   }
 );
 
-/**
- * lobbyId : ロビーID
- * users : ロビーにいるプレイヤーの一覧
- * userNumber : プレイヤー番号(保持)
- */
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
   const [isHost, setIsHost] = useState(false); // ホストかどうか
+  const [start, setStart] = useState(false);
   const [users, setUsers] = useState<string[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
@@ -64,10 +60,13 @@ export default function LobbyPlay({ params }: { params: any }) {
 
     ws.current = new WebSocket("ws://localhost:3001");
     ws.current.onopen = () => {
+      const userName = new URLSearchParams(window.location.search).get(
+        "userName"
+      );
       ws.current?.send(
         JSON.stringify({
           type: "join",
-          payload: { lobby: lobbyId },
+          payload: { lobby: lobbyId, userName: userName },
         })
       );
     };
@@ -113,19 +112,18 @@ export default function LobbyPlay({ params }: { params: any }) {
     }
   };
 
+  const startGame = () => {
+    if (ws.current) {
+      ws.current.send(JSON.stringify({ type: "start", payload: true }));
+      setStart(true);
+    }
+  };
+
   if (result !== null) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
         <Link href="/">トップに戻る</Link>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Error error={error} />
       </div>
     );
   }
@@ -139,7 +137,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     );
   }
 
-  if (userNumber !== null && users.length === MAX_USERS) {
+  if (userNumber !== null && users.length === MAX_USERS && start && !isMyTurn) {
     return (
       <LobbyContext.Provider
         value={{
@@ -174,7 +172,10 @@ export default function LobbyPlay({ params }: { params: any }) {
           lobbyId={lobbyId}
           users={users}
           userNumber={userNumber}
+          isHost={isHost}
+          startGame={startGame}
         />
+        <span>{users.length}人います</span>
       </div>
     </LobbyContext.Provider>
   );
