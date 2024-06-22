@@ -41,6 +41,7 @@ export default function Home() {
         >
           ロビーに入る
         </button>
+        
       </div>
     </div>
   );

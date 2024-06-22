@@ -19,7 +19,7 @@ const MAX_USERS = 4;
 
 export const LobbyContext = createContext<{
   currentPlayer: number | null;
-  users: number[];
+  users: string[];
   isMyTurn: boolean;
   setIsMyTurn: Dispatch<SetStateAction<boolean>>;
   sendMessage: () => void;
@@ -27,7 +27,7 @@ export const LobbyContext = createContext<{
 }>(
   {} as {
     currentPlayer: number | null;
-    users: number[];
+    users: string[];
     isMyTurn: boolean;
     setIsMyTurn: Dispatch<SetStateAction<boolean>>;
     sendMessage: () => void;
@@ -42,7 +42,8 @@ export const LobbyContext = createContext<{
  */
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
-  const [users, setUsers] = useState<number[]>([]);
+  const [isHost, setIsHost] = useState(false); // ホストかどうか
+  const [users, setUsers] = useState<string[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -64,20 +65,28 @@ export default function LobbyPlay({ params }: { params: any }) {
     ws.current = new WebSocket("ws://localhost:3001");
     ws.current.onopen = () => {
       ws.current?.send(
-        JSON.stringify({ type: "join", payload: { lobby: lobbyId } })
+        JSON.stringify({
+          type: "join",
+          payload: { lobby: lobbyId },
+        })
       );
     };
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
-      if (parsedMessage.type === "number") {
+      if (parsedMessage.type === "authority") {
+        setIsHost(parsedMessage.payload);
+        console.log("Is host:", parsedMessage.payload);
+      } else if (parsedMessage.type === "number") {
         setUserNumber(parsedMessage.payload);
-        console.log("Set user number:", parsedMessage.payload);
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
+        console.log("Set users:", parsedMessage.payload);
         getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
+      } else if (parsedMessage.type === "shuffle") {
+        setUsers(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
-        setIsMyTurn(true);
+        setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
         setInput(parsedMessage.payload);

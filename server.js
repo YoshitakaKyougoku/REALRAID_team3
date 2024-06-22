@@ -23,27 +23,37 @@ wss.on("connection", (ws) => {
           lastMessage: "",
         };
       }
-      if (lobbies[currentLobby].clients.length >= MAX_USERS) {
-        ws.send(
-          JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
-        );
-        return;
-      }
+
+      // joinしたときにユーザー名を保存
+      // userName = parsedMessage.payload.userName;
       userNumber = lobbies[currentLobby].clients.length + 1;
       lobbies[currentLobby].clients.push({ ws, userNumber });
+      if (lobbies[currentLobby].clients.length === 1) {
+        lobbies[currentLobby].clients[0].ws.send(
+          JSON.stringify({ type: "authority", payload: true })
+        );
+      }
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
+      // プレイヤーの名前を送信
       const users = lobbies[currentLobby].clients.map(
-        (client) => client.userNumber
+        (client) => client.userName
       );
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
+      // ユーザーが4人になったら、最初のユーザーにターンを通知
       if (lobbies[currentLobby].clients.length === MAX_USERS) {
         lobbies[currentLobby].clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
+      } else if (lobbies[currentLobby].clients.length >= MAX_USERS) {
+        // ユーザーが4人以上になったら、エラーを返す
+        ws.send(
+          JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
+        );
+        return;
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];

@@ -1,6 +1,6 @@
 interface ShowCurrentPlayerProps {
   lobbyId: string;
-  users: number[];
+  users: string[];
   userNumber: number | null;
 }
 
