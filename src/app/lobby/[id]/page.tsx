@@ -23,6 +23,7 @@ export const LobbyContext = createContext<{
   isMyTurn: boolean;
   setIsMyTurn: Dispatch<SetStateAction<boolean>>;
   sendMessage: () => void;
+  getCurrentPlayer: () => void;
 }>(
   {} as {
     currentPlayer: number | null;
@@ -30,6 +31,7 @@ export const LobbyContext = createContext<{
     isMyTurn: boolean;
     setIsMyTurn: Dispatch<SetStateAction<boolean>>;
     sendMessage: () => void;
+    getCurrentPlayer: () => void;
   }
 );
 
@@ -50,6 +52,12 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [result, setResult] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
 
+  const getCurrentPlayer = () => {
+    if (ws.current) {
+      ws.current.send(JSON.stringify({ type: "getCurrentPlayer" }));
+    }
+  };
+
   useEffect(() => {
     if (!lobbyId) return;
 
@@ -67,6 +75,7 @@ export default function LobbyPlay({ params }: { params: any }) {
         console.log("Set user number:", parsedMessage.payload);
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
+        getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(true);
       } else if (parsedMessage.type === "previousMessage") {
@@ -123,19 +132,41 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (userNumber !== null && users.length === MAX_USERS) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <Waiting currentPlayer={currentPlayer} />
-      </div>
+      <LobbyContext.Provider
+        value={{
+          currentPlayer,
+          users,
+          isMyTurn,
+          setIsMyTurn,
+          sendMessage,
+          getCurrentPlayer,
+        }}
+      >
+        <div className="flex flex-col items-center justify-center h-screen space-y-4">
+          <Waiting currentPlayer={currentPlayer} />
+        </div>
+      </LobbyContext.Provider>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <ShowCurrentPlayer
-        lobbyId={lobbyId}
-        users={users}
-        userNumber={userNumber}
-      />
-    </div>
+    <LobbyContext.Provider
+      value={{
+        currentPlayer,
+        users,
+        isMyTurn,
+        setIsMyTurn,
+        sendMessage,
+        getCurrentPlayer,
+      }}
+    >
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <ShowCurrentPlayer
+          lobbyId={lobbyId}
+          users={users}
+          userNumber={userNumber}
+        />
+      </div>
+    </LobbyContext.Provider>
   );
 }

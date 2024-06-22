@@ -86,6 +86,17 @@ wss.on("connection", (ws) => {
           });
         }
       }
+    } else if (parsedMessage.type === "getCurrentPlayer" && currentLobby) {
+      const lobby = lobbies[currentLobby];
+      if (lobby) {
+        const currentPlayerNumber = lobby.clients[lobby.currentTurn].userNumber;
+        ws.send(
+          JSON.stringify({
+            type: "currentPlayer",
+            payload: currentPlayerNumber,
+          })
+        );
+      }
     }
   });
 
