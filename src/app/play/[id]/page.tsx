@@ -28,7 +28,6 @@ export const PlayContext = createContext<{
 export default function Play({ params }: { params: any }) {
   const lobbyId = params.id;
   const [input, setInput] = useState("");
-  const [userNumber, setUserNumber] = useState<number | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -47,10 +46,7 @@ export default function Play({ params }: { params: any }) {
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
-      if (parsedMessage.type === "number") {
-        setUserNumber(parsedMessage.payload);
-        console.log("Set user number:", parsedMessage.payload);
-      } else if (parsedMessage.type === "previousMessage") {
+      if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
         setInput(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
@@ -87,9 +83,6 @@ export default function Play({ params }: { params: any }) {
     <PlayContext.Provider value={{ isMyTurn, setIsMyTurn, sendMessage }}>
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
         {isMyTurn && <Timer totalTime={600} />}
-        {userNumber !== null && (
-          <div className="text-lg">あなたの番号: {userNumber}</div>
-        )}
         {previousMessage && (
           <div className="text-lg">前のメッセージ: {previousMessage}</div>
         )}
