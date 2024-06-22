@@ -5,18 +5,14 @@ const server = createServer();
 const wss = new WebSocketServer({ server });
 
 const lobbies = {};
-// 最大4人まで参加可能
 const MAX_USERS = 4;
 
-// クライアントから接続がある時に呼ばれる
 wss.on("connection", (ws) => {
   let currentLobby = null;
   let userNumber = null;
 
-  // クライアントからメッセージが送られてきた時に呼ばれる
   ws.on("message", (message) => {
     const parsedMessage = JSON.parse(message.toString());
-    // プレイヤーがロビーに入室する
     if (parsedMessage.type === "join") {
       currentLobby = parsedMessage.payload.lobby;
       if (!lobbies[currentLobby]) {
@@ -27,19 +23,16 @@ wss.on("connection", (ws) => {
           lastMessage: "",
         };
       }
-      // ロビーの人数が最大人数を超えていたら忠告する
       if (lobbies[currentLobby].clients.length >= MAX_USERS) {
         ws.send(
           JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
         );
         return;
       }
-      // ロビーに入室したプレイヤーに番号を割り当てる
       userNumber = lobbies[currentLobby].clients.length + 1;
       lobbies[currentLobby].clients.push({ ws, userNumber });
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
-      // ロビーに入室したプレイヤーに他のプレイヤーのリストを送信する
       const users = lobbies[currentLobby].clients.map(
         (client) => client.userNumber
       );
@@ -48,10 +41,6 @@ wss.on("connection", (ws) => {
       });
 
       if (lobbies[currentLobby].clients.length === MAX_USERS) {
-        lobbies[currentLobby].clients.forEach((client) => {
-          client.ws.send(JSON.stringify({ type: "playing" }));
-        });
-        // プレイヤー1のターンを最初に設定
         lobbies[currentLobby].clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
@@ -86,6 +75,15 @@ wss.on("connection", (ws) => {
               payload: lobby.lastMessage,
             })
           );
+          // すべてのクライアントに現在プレイしているユーザーを送信
+          lobby.clients.forEach((client) => {
+            client.ws.send(
+              JSON.stringify({
+                type: "currentPlayer",
+                payload: lobby.clients[lobby.currentTurn].userNumber,
+              })
+            );
+          });
         }
       }
     }

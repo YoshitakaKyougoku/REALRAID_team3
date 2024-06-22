@@ -1,8 +1,14 @@
-import { LobbyContext } from "@/app/lobby/[id]/page";
-import { useContext } from "react";
+interface ShowCurrentPlayerProps {
+  lobbyId: string;
+  users: number[];
+  userNumber: number | null;
+}
 
-export default function ShowCurrentPlayer({ lobbyId }: { lobbyId: string }) {
-  const { userNumber, users } = useContext(LobbyContext);
+export default function ShowCurrentPlayer({
+  lobbyId,
+  users,
+  userNumber,
+}: ShowCurrentPlayerProps) {
   return (
     <div>
       <h1 className="text-2xl font-bold">ロビーID: {lobbyId}</h1>

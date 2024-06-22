@@ -1,27 +1,53 @@
 "use client";
 
-import { useState, useEffect, useRef, createContext } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useState,
+  useEffect,
+  useRef,
+  createContext,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import AnswerInput from "@/features/play/components/AnswerInput";
+import Timer from "@/features/play/components/Timer";
+import Waiting from "@/features/play/components/Waiting";
 import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
+import Link from "next/link";
+
+const MAX_USERS = 4;
 
 export const LobbyContext = createContext<{
-  userNumber: number | null;
+  currentPlayer: number | null;
   users: number[];
+  isMyTurn: boolean;
+  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+  sendMessage: () => void;
 }>(
   {} as {
-    userNumber: number | null;
+    currentPlayer: number | null;
     users: number[];
+    isMyTurn: boolean;
+    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+    sendMessage: () => void;
   }
 );
 
-export default function Lobby({ params }: { params: any }) {
-  const router = useRouter();
+/**
+ * lobbyId : ロビーID
+ * users : ロビーにいるプレイヤーの一覧
+ * userNumber : プレイヤー番号(保持)
+ */
+export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
-  console.log(lobbyId);
   const [users, setUsers] = useState<number[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [input, setInput] = useState("");
+  const [isMyTurn, setIsMyTurn] = useState(false);
+  const [previousMessage, setPreviousMessage] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -36,13 +62,21 @@ export default function Lobby({ params }: { params: any }) {
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
-      console.log(parsedMessage);
       if (parsedMessage.type === "number") {
         setUserNumber(parsedMessage.payload);
+        console.log("Set user number:", parsedMessage.payload);
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
-      } else if (parsedMessage.type === "playing") {
-        router.push(`/play/${lobbyId}`);
+      } else if (parsedMessage.type === "turn") {
+        setIsMyTurn(true);
+      } else if (parsedMessage.type === "previousMessage") {
+        setPreviousMessage(parsedMessage.payload);
+        setInput(parsedMessage.payload);
+      } else if (parsedMessage.type === "result") {
+        setResult(parsedMessage.payload ? "正解！" : "不正解！");
+      } else if (parsedMessage.type === "currentPlayer") {
+        setCurrentPlayer(parsedMessage.payload);
+        console.log("Set current player:", parsedMessage.payload);
       } else if (parsedMessage.type === "error") {
         setError(parsedMessage.payload);
       }
@@ -51,17 +85,57 @@ export default function Lobby({ params }: { params: any }) {
     return () => {
       ws.current?.close();
     };
-  }, [lobbyId, router]);
+  }, [lobbyId]);
+
+  const sendMessage = () => {
+    if (ws.current && input && isMyTurn) {
+      ws.current.send(JSON.stringify({ type: "message", payload: input }));
+      setInput("");
+      setIsMyTurn(false);
+    }
+  };
+
+  if (result !== null) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="text-2xl font-bold">結果: {result}</div>
+        <Link href="/">トップに戻る</Link>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Error error={error} />
+      </div>
+    );
+  }
+
+  if (isMyTurn) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <Timer userNumber={userNumber} totalTime={600} />
+        <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
+      </div>
+    );
+  }
+
+  if (userNumber !== null && users.length === MAX_USERS) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <Waiting currentPlayer={currentPlayer} />
+      </div>
+    );
+  }
 
   return (
-    <LobbyContext.Provider value={{ userNumber, users }}>
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        {error ? (
-          <Error error={error} />
-        ) : (
-          <ShowCurrentPlayer lobbyId={lobbyId} />
-        )}
-      </div>
-    </LobbyContext.Provider>
+    <div className="flex flex-col items-center justify-center h-screen space-y-4">
+      <ShowCurrentPlayer
+        lobbyId={lobbyId}
+        users={users}
+        userNumber={userNumber}
+      />
+    </div>
   );
 }
