@@ -3,11 +3,11 @@ import styles from "./Timer.module.css";
 import { LobbyContext } from "@/app/lobby/[id]/page";
 
 interface TimerProps {
-  userNumber: number | null;
+  userName: string | null;
   totalTime: number;
 }
 
-const Timer: React.FC<TimerProps> = ({ userNumber, totalTime }) => {
+const Timer: React.FC<TimerProps> = ({ userName, totalTime }) => {
   const { isMyTurn, setIsMyTurn, sendMessage } = useContext(LobbyContext);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
@@ -54,7 +54,7 @@ const Timer: React.FC<TimerProps> = ({ userNumber, totalTime }) => {
   return (
     <div>
       <span className={styles.center}>
-        {userNumber} のターンです
+        {userName} のターンです
         <br />
         残り {timeLeft > 0 ? timeLeft : "時間切れ"} 秒
       </span>

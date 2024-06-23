@@ -17,8 +17,6 @@ wss.on("connection", (ws) => {
     if (parsedMessage.type === "join") {
       currentLobby = parsedMessage.payload.lobby;
       userName = parsedMessage.payload.userName;
-
-      // ロビーの初期化
       if (!lobbies[currentLobby]) {
         lobbies[currentLobby] = {
           clients: [],
@@ -27,19 +25,16 @@ wss.on("connection", (ws) => {
           lastMessage: "",
         };
       }
-
+      if (lobbies[currentLobby].clients.length >= MAX_USERS) {
+        ws.send(
+          JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
+        );
+        return;
+      }
       userNumber = lobbies[currentLobby].clients.length + 1;
       lobbies[currentLobby].clients.push({ ws, userNumber, userName });
-
-      // ユーザー番号1に権限を付与
-      if (lobbies[currentLobby].clients.length === 1) {
-        lobbies[currentLobby].clients[0].ws.send(
-          JSON.stringify({ type: "authority", payload: true })
-        );
-      }
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
-      // プレイヤーの名前を送信
       const users = lobbies[currentLobby].clients.map(
         (client) => client.userName
       );
@@ -47,12 +42,30 @@ wss.on("connection", (ws) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
-      // ユーザーが4人以上になったら、エラーを返す
-      if (lobbies[currentLobby].clients.length > MAX_USERS + 1) {
-        ws.send(
-          JSON.stringify({ type: "error", payload: "ロビーは満員です。" })
+      // ユーザー番号1に権限を付与
+      if (lobbies[currentLobby].clients.length === 1) {
+        lobbies[currentLobby].clients[0].ws.send(
+          JSON.stringify({ type: "authority", payload: true })
         );
-        return;
+      }
+
+      // ユーザーが4人以上になったら、エラーを返す
+      // if (lobbies[currentLobby].clients.length === MAX_USERS) {
+      //   lobbies[currentLobby].clients[0].ws.send(
+      //     JSON.stringify({ type: "turn", payload: true })
+      //   );
+      // }
+    } else if (parsedMessage.type === "startGame" && currentLobby) {
+      const lobby = lobbies[currentLobby];
+      if (lobby.clients[0].ws === ws) {
+        lobby.clients[0].ws.send(
+          JSON.stringify({ type: "turn", payload: true })
+        );
+        lobby.clients.forEach((client) => {
+          client.ws.send(
+            JSON.stringify({ type: "gameStarted", payload: true })
+          );
+        });
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
@@ -84,22 +97,24 @@ wss.on("connection", (ws) => {
               payload: lobby.lastMessage,
             })
           );
+          lobby.clients.forEach((client) => {
+            client.ws.send(
+              JSON.stringify({
+                type: "currentPlayer",
+                payload: lobby.clients[lobby.currentTurn].userName,
+              })
+            );
+          });
         }
-      }
-    } else if (parsedMessage.type === "start" && currentLobby) {
-      if (lobbies[currentLobby].clients.length == MAX_USERS) {
-        lobbies[currentLobby].clients[0].ws.send(
-          JSON.stringify({ type: "turn", payload: true })
-        );
       }
     } else if (parsedMessage.type === "getCurrentPlayer" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby) {
-        const currentPlayerNumber = lobby.clients[lobby.currentTurn].userNumber;
+        const currentPlayer = lobby.clients[lobby.currentTurn].userName;
         ws.send(
           JSON.stringify({
             type: "currentPlayer",
-            payload: currentPlayerNumber,
+            payload: currentPlayer,
           })
         );
       }
