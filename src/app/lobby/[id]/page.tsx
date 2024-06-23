@@ -17,7 +17,6 @@ import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
 
 export const LobbyContext = createContext<{
-  currentPlayer: string | null;
   users: string[];
   isMyTurn: boolean;
   setIsMyTurn: Dispatch<SetStateAction<boolean>>;
@@ -25,7 +24,6 @@ export const LobbyContext = createContext<{
   getCurrentPlayer: () => void;
 }>(
   {} as {
-    currentPlayer: string | null;
     users: string[];
     isMyTurn: boolean;
     setIsMyTurn: Dispatch<SetStateAction<boolean>>;
@@ -65,16 +63,15 @@ export default function LobbyPlay({ params }: { params: any }) {
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
-      if (parsedMessage.type === "number") {
+      if (parsedMessage.type === "authority") {
+        setIsHost(parsedMessage.payload);
+        console.log("Is host:", parsedMessage.payload);
+      } else if (parsedMessage.type === "number") {
         setUserNumber(parsedMessage.payload);
-        console.log("Set user number:", parsedMessage.payload);
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
         console.log("Set users:", parsedMessage.payload);
         getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
-      } else if (parsedMessage.type === "authority") {
-        setIsHost(parsedMessage.payload);
-        console.log("Is host:", parsedMessage.payload);
       } else if (parsedMessage.type === "shuffle") {
         setUsers(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
@@ -143,7 +140,6 @@ export default function LobbyPlay({ params }: { params: any }) {
     return (
       <LobbyContext.Provider
         value={{
-          currentPlayer,
           users,
           isMyTurn,
           setIsMyTurn,
@@ -151,7 +147,9 @@ export default function LobbyPlay({ params }: { params: any }) {
           getCurrentPlayer,
         }}
       >
-        <Waiting currentPlayer={currentPlayer} />
+        <div className="flex flex-col items-center justify-center h-screen space-y-4">
+          <Waiting currentPlayer={currentPlayer} />
+        </div>
       </LobbyContext.Provider>
     );
   }
@@ -159,7 +157,6 @@ export default function LobbyPlay({ params }: { params: any }) {
   return (
     <LobbyContext.Provider
       value={{
-        currentPlayer,
         users,
         isMyTurn,
         setIsMyTurn,
