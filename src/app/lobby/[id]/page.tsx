@@ -16,6 +16,8 @@ import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
 
+import { useSearchParams } from "next/navigation";
+
 const MAX_USERS = 4;
 
 export const LobbyContext = createContext<{
@@ -43,6 +45,8 @@ export const LobbyContext = createContext<{
  */
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
+  const searchParams = useSearchParams();
+  const username = searchParams.get("username");
   const [users, setUsers] = useState<number[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
@@ -51,6 +55,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [gameStarted, setGameStarted] = useState(false);
   const ws = useRef<WebSocket | null>(null);
 
   const getCurrentPlayer = () => {
@@ -89,6 +94,8 @@ export default function LobbyPlay({ params }: { params: any }) {
         console.log("Set current player:", parsedMessage.payload);
       } else if (parsedMessage.type === "error") {
         setError(parsedMessage.payload);
+      } else if(parsedMessage.type === "gameStarted"){
+        setGameStarted(parsedMessage.payload);
       }
     };
 
@@ -102,6 +109,13 @@ export default function LobbyPlay({ params }: { params: any }) {
       ws.current.send(JSON.stringify({ type: "message", payload: input }));
       setInput("");
       setIsMyTurn(false);
+    }
+  };
+
+  // ゲームを開始する
+  const startGame = () => {
+    if (ws.current) {
+      ws.current.send(JSON.stringify({ type: "startGame" }));
     }
   };
 
@@ -131,7 +145,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     );
   }
 
-  if (userNumber !== null && users.length === MAX_USERS) {
+  if (gameStarted&&!isMyTurn) {
     return (
       <LobbyContext.Provider
         value={{
@@ -162,6 +176,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <h3>あなたの名前：{username}</h3>
         <ExitLobby />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
@@ -169,6 +184,9 @@ export default function LobbyPlay({ params }: { params: any }) {
           userNumber={userNumber}
         />
       </div>
+      {userNumber === 1 && users.length >= 2 && (
+          <button onClick={startGame}>ゲームを開始</button>
+        )}
     </LobbyContext.Provider>
   );
 }
