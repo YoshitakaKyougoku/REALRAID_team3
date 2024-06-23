@@ -24,3 +24,4 @@ const InputUsername = ({username,setUsername}:InputUsernameProps) => {
 };
 
 export default InputUsername;
+

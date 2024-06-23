@@ -10,11 +10,13 @@ const MAX_USERS = 4;
 wss.on("connection", (ws) => {
   let currentLobby = null;
   let userNumber = null;
+  let userName = null;
 
   ws.on("message", (message) => {
     const parsedMessage = JSON.parse(message.toString());
     if (parsedMessage.type === "join") {
       currentLobby = parsedMessage.payload.lobby;
+      userName = parsedMessage.payload.userName;
       if (!lobbies[currentLobby]) {
         lobbies[currentLobby] = {
           clients: [],
@@ -30,16 +32,24 @@ wss.on("connection", (ws) => {
         return;
       }
       userNumber = lobbies[currentLobby].clients.length + 1;
-      lobbies[currentLobby].clients.push({ ws, userNumber });
+      lobbies[currentLobby].clients.push({ ws, userNumber, userName });
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
       const users = lobbies[currentLobby].clients.map(
-        (client) => client.userNumber
+        (client) => client.userName
       );
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
+      // ユーザー番号1に権限を付与
+      if (lobbies[currentLobby].clients.length === 1) {
+        lobbies[currentLobby].clients[0].ws.send(
+          JSON.stringify({ type: "authority", payload: true })
+        );
+      }
+
+      // ユーザーが4人以上になったら、エラーを返す
       // if (lobbies[currentLobby].clients.length === MAX_USERS) {
       //   lobbies[currentLobby].clients[0].ws.send(
       //     JSON.stringify({ type: "turn", payload: true })
@@ -87,12 +97,11 @@ wss.on("connection", (ws) => {
               payload: lobby.lastMessage,
             })
           );
-          // すべてのクライアントに現在プレイしているユーザーを送信
           lobby.clients.forEach((client) => {
             client.ws.send(
               JSON.stringify({
                 type: "currentPlayer",
-                payload: lobby.clients[lobby.currentTurn].userNumber,
+                payload: nextClient.userName,
               })
             );
           });
@@ -101,11 +110,11 @@ wss.on("connection", (ws) => {
     } else if (parsedMessage.type === "getCurrentPlayer" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby) {
-        const currentPlayerNumber = lobby.clients[lobby.currentTurn].userNumber;
+        const currentPlayer = lobby.clients[lobby.currentTurn].userName;
         ws.send(
           JSON.stringify({
             type: "currentPlayer",
-            payload: currentPlayerNumber,
+            payload: currentPlayer,
           })
         );
       }
