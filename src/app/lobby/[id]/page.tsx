@@ -55,6 +55,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [gameStarted, setGameStarted] = useState(false);
   const ws = useRef<WebSocket | null>(null);
 
   const getCurrentPlayer = () => {
@@ -93,6 +94,8 @@ export default function LobbyPlay({ params }: { params: any }) {
         console.log("Set current player:", parsedMessage.payload);
       } else if (parsedMessage.type === "error") {
         setError(parsedMessage.payload);
+      } else if(parsedMessage.type === "gameStarted"){
+        setGameStarted(parsedMessage.payload);
       }
     };
 
@@ -106,6 +109,13 @@ export default function LobbyPlay({ params }: { params: any }) {
       ws.current.send(JSON.stringify({ type: "message", payload: input }));
       setInput("");
       setIsMyTurn(false);
+    }
+  };
+
+  // ゲームを開始する
+  const startGame = () => {
+    if (ws.current) {
+      ws.current.send(JSON.stringify({ type: "startGame" }));
     }
   };
 
@@ -135,7 +145,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     );
   }
 
-  if (userNumber !== null && users.length === MAX_USERS) {
+  if (gameStarted&&!isMyTurn) {
     return (
       <LobbyContext.Provider
         value={{
@@ -174,6 +184,9 @@ export default function LobbyPlay({ params }: { params: any }) {
           userNumber={userNumber}
         />
       </div>
+      {userNumber === 1 && users.length >= 2 && (
+          <button onClick={startGame}>ゲームを開始</button>
+        )}
     </LobbyContext.Provider>
   );
 }

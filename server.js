@@ -40,10 +40,22 @@ wss.on("connection", (ws) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
-      if (lobbies[currentLobby].clients.length === MAX_USERS) {
-        lobbies[currentLobby].clients[0].ws.send(
+      // if (lobbies[currentLobby].clients.length === MAX_USERS) {
+      //   lobbies[currentLobby].clients[0].ws.send(
+      //     JSON.stringify({ type: "turn", payload: true })
+      //   );
+      // }
+    } else if (parsedMessage.type === "startGame" && currentLobby) {
+      const lobby = lobbies[currentLobby];
+      if (lobby.clients[0].ws === ws) {
+        lobby.clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
+        lobby.clients.forEach((client) => {
+          client.ws.send(
+            JSON.stringify({ type: "gameStarted", payload: true })
+          );
+        });
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
