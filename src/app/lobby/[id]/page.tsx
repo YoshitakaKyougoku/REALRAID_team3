@@ -14,6 +14,7 @@ import Waiting from "@/features/play/components/Waiting";
 import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
+import ExitLobby from "@/features/lobby/components/ExitLobby";
 
 const MAX_USERS = 4;
 
@@ -161,6 +162,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <ExitLobby />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
           users={users}
