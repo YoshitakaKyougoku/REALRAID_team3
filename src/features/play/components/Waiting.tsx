@@ -11,7 +11,7 @@ export default function Waiting({ currentPlayer }: WaitingProps) {
       <span className={styles.loadingTitle}></span>
       <div className={styles.currentPlayer}>
         {currentPlayer !== null
-          ? `プレイヤー${currentPlayer}が回答中`
+          ? `プレイヤー ${currentPlayer} が回答中`
           : "プレイヤー情報を取得中"}
       </div>
     </div>

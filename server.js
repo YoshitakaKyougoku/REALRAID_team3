@@ -101,7 +101,7 @@ wss.on("connection", (ws) => {
             client.ws.send(
               JSON.stringify({
                 type: "currentPlayer",
-                payload: lobby.clients[lobby.currentTurn].userName,
+                payload: nextClient.userName,
               })
             );
           });
