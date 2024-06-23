@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./Timer.module.css";
-import { PlayContext } from "@/app/play/[id]/page";
+import { LobbyContext } from "@/app/lobby/[id]/page";
 
 interface TimerProps {
+  userNumber: number | null;
   totalTime: number;
 }
 
-const Timer: React.FC<TimerProps> = ({ totalTime }) => {
-  const { isMyTurn, setIsMyTurn, sendMessage } = useContext(PlayContext);
+const Timer: React.FC<TimerProps> = ({ userNumber, totalTime }) => {
+  const { isMyTurn, setIsMyTurn, sendMessage } = useContext(LobbyContext);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(
@@ -53,7 +54,9 @@ const Timer: React.FC<TimerProps> = ({ totalTime }) => {
   return (
     <div>
       <span className={styles.center}>
-        残り{timeLeft > 0 ? timeLeft : "Over the time limit!"}秒
+        {userNumber} のターンです
+        <br />
+        残り {timeLeft > 0 ? timeLeft : "時間切れ"} 秒
       </span>
       <div className={styles.progress}>
         <div
