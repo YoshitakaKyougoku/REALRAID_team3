@@ -16,6 +16,8 @@ import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
 
+import { useSearchParams } from "next/navigation";
+
 const MAX_USERS = 4;
 
 export const LobbyContext = createContext<{
@@ -43,6 +45,8 @@ export const LobbyContext = createContext<{
  */
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
+  const searchParams = useSearchParams();
+  const username = searchParams.get("username");
   const [users, setUsers] = useState<number[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
@@ -162,6 +166,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
+        <h3>あなたの名前：{username}</h3>
         <ExitLobby />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
