@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
@@ -15,22 +8,7 @@ import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
-
-export const LobbyContext = createContext<{
-  users: string[];
-  isMyTurn: boolean;
-  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-  sendMessage: () => void;
-  getCurrentPlayer: () => void;
-}>(
-  {} as {
-    users: string[];
-    isMyTurn: boolean;
-    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-    sendMessage: () => void;
-    getCurrentPlayer: () => void;
-  }
-);
+import { LobbyContext } from "@/provider/lobby";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
