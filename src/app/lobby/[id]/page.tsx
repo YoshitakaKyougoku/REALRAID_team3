@@ -49,6 +49,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
+  const [initialPrompt, setInitialPrompt] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const userName = new URLSearchParams(window.location.search).get("userName");
 
@@ -92,6 +93,9 @@ export default function LobbyPlay({ params }: { params: any }) {
         setError(parsedMessage.payload);
       } else if (parsedMessage.type === "initialImage") {
         setInitialImage(parsedMessage.payload);
+      } else if (parsedMessage.type === "initialPrompt") {
+        console.log(initialPrompt)
+        setInitialPrompt(parsedMessage.payload);
       } else if (parsedMessage.type === "generatedImage") {
         setGeneratedImage(parsedMessage.payload);
         console.log("set //" + chatgpt);
@@ -137,6 +141,7 @@ export default function LobbyPlay({ params }: { params: any }) {
         <Link href="/">トップに戻る</Link>
         {chatgpt}
         <p>お題</p>
+        {initialPrompt}
         <figure>
           <Image
             src={`data:image/png;base64,${initialImage}`}
@@ -146,6 +151,7 @@ export default function LobbyPlay({ params }: { params: any }) {
           />
         </figure>
         <p>生成された画像</p>
+        {previousMessage}
         <figure>
           <Image
             src={`data:image/png;base64,${generatedImage}`}

@@ -1,7 +1,9 @@
 const { WebSocketServer, WebSocket } = require("ws");
 const { createServer } = require("http");
 const { generateImage } = require("./imageGenerator");
-const { generateText } = require("./chatgpt");
+const { generateAnswer } = require("./chatgpt");
+const { translate } = require("./chatgpt");
+const { generatePrompt } = require("./chatgpt");
 
 const server = createServer();
 const wss = new WebSocketServer({ server });
@@ -68,9 +70,12 @@ wss.on("connection", (ws) => {
       // }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
-      const imageData = await generateImage(
-        "Woman drinking iced coffee while looking left at a cafe"
-      );
+      const initialPrompt = await generatePrompt();
+      lobby.originalMessage = initialPrompt;
+      console.log(initialPrompt);
+      const translatedPrompt = await translate(initialPrompt);
+      console.log(translatedPrompt);
+      const imageData = await generateImage(translatedPrompt);
       if (lobby.clients[0].ws === ws) {
         lobby.clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
@@ -89,20 +94,20 @@ wss.on("connection", (ws) => {
       const currentClient = lobby.clients[lobby.currentTurn];
       if (currentClient.ws === ws) {
         if (lobby.currentTurn === 0) {
-          lobby.originalMessage =
-            "Woman drinking iced coffee while looking left at a cafe";
+          
         }
         lobby.lastMessage = parsedMessage.payload;
 
         lobby.currentTurn = (lobby.currentTurn + 1) % lobby.clients.length;
 
         try {
-          const imageData = await generateImage(lobby.lastMessage);
+          const translatedPrompt = await translate(lobby.lastMessage);
+          const imageData = await generateImage(translatedPrompt);
 
           if (lobby.currentTurn === 0) {
             const isCorrect = lobby.lastMessage === lobby.originalMessage;
             console.log("call chatgpt");
-            const chatgptRes = await generateText(
+            const chatgptRes = await generateAnswer(
               lobby.originalMessage,
               lobby.lastMessage
             );
@@ -118,6 +123,12 @@ wss.on("connection", (ws) => {
                 JSON.stringify({
                   type: "generatedImage",
                   payload: imageData,
+                })
+              );
+              client.ws.send(
+                JSON.stringify({
+                  type: "initialPrompt",
+                  payload: lobby.originalMessage,
                 })
               );
               console.log("chatgptRes//" + chatgptRes);
