@@ -165,7 +165,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <ExitLobby />
+        <ExitLobby ws={ws.current} />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
           users={users}

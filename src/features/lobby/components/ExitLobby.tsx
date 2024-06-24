@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
 
-const ExitLobby = () => {
+interface ExitProps {
+  ws: WebSocket | null;
+}
+
+const ExitLobby: FC<ExitProps> = ({ ws }) => {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -17,6 +21,7 @@ const ExitLobby = () => {
 
   const handleExit = () => {
     console.log("ホームに戻ります");
+    ws?.send(JSON.stringify({ type: "exit" }));
     router.push("/");
     hideModal();
   };

@@ -55,6 +55,21 @@ wss.on("connection", (ws) => {
       //     JSON.stringify({ type: "turn", payload: true })
       //   );
       // }
+    } else if (parsedMessage.type === "exit" && currentLobby) {
+      // 退出処理を書く
+      const lobby = lobbies[currentLobby];
+      if (lobby) {
+        lobby.clients = lobby.clients.filter((client) => client.ws !== ws);
+        users = lobby.clients.map((client) => client.userName);
+        lobby.clients.forEach((client) => {
+          client.ws.send(
+            JSON.stringify({
+              type: "userList",
+              payload: users,
+            })
+          );
+        });
+      }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby.clients[0].ws === ws) {
