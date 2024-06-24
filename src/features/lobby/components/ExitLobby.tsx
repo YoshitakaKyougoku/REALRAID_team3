@@ -1,14 +1,28 @@
-import React, { FC, useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
+import { LobbyContext } from "@/app/lobby/[id]/page";
 
 interface ExitProps {
   ws: WebSocket | null;
+  userNumber: number | null;
 }
 
-const ExitLobby: FC<ExitProps> = ({ ws }) => {
+const ExitLobby: FC<ExitProps> = ({ ws, userNumber }) => {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
+  const { setUsers } = useContext(LobbyContext);
+
+  useEffect(() => {
+    if (ws) {
+      ws.onmessage = (message) => {
+        const parsedMessage = JSON.parse(message.data);
+        if (parsedMessage.type === "userList") {
+          setUsers(parsedMessage.payload);
+        }
+      };
+    }
+  }, [ws, setUsers]);
 
   const showModal = () => {
     setModalVisible(true);
@@ -21,7 +35,7 @@ const ExitLobby: FC<ExitProps> = ({ ws }) => {
 
   const handleExit = () => {
     console.log("ホームに戻ります");
-    ws?.send(JSON.stringify({ type: "exit" }));
+    ws?.send(JSON.stringify({ type: "exit", payload: userNumber }));
     router.push("/");
     hideModal();
   };

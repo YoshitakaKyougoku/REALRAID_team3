@@ -41,46 +41,47 @@ wss.on("connection", (ws) => {
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
-
-      // ユーザー番号1に権限を付与
-      if (lobbies[currentLobby].clients.length === 1) {
-        lobbies[currentLobby].clients[0].ws.send(
-          JSON.stringify({ type: "authority", payload: true })
-        );
-      }
-
-      // ユーザーが4人以上になったら、エラーを返す
-      // if (lobbies[currentLobby].clients.length === MAX_USERS) {
-      //   lobbies[currentLobby].clients[0].ws.send(
-      //     JSON.stringify({ type: "turn", payload: true })
-      //   );
-      // }
     } else if (parsedMessage.type === "exit" && currentLobby) {
-      // 退出処理を書く
+      const exitUser = parsedMessage.payload;
       const lobby = lobbies[currentLobby];
-      if (lobby) {
-        lobby.clients = lobby.clients.filter((client) => client.ws !== ws);
-        users = lobby.clients.map((client) => client.userName);
-        lobby.clients.forEach((client) => {
-          client.ws.send(
-            JSON.stringify({
-              type: "userList",
-              payload: users,
-            })
-          );
-        });
+
+      const exitingClient = lobby.clients.find(
+        (client) => client.userNumber === exitUser
+      );
+
+      if (!exitingClient) return; // If no such user exists, exit early
+
+      const exitUserNumber = exitingClient.userNumber;
+
+      lobby.clients = lobby.clients.filter(
+        (client) => client.userNumber !== exitUser
+      );
+
+      // 更新後のuserNumberを再設定
+      lobby.clients.forEach((client, index) => {
+        client.userNumber = index + 1;
+      });
+
+      const users = lobby.clients.map((client) => client.userName);
+
+      lobby.clients.forEach((client) => {
+        client.ws.send(JSON.stringify({ type: "userList", payload: users }));
+      });
+
+      if (lobby.clients.length === 0) {
+        delete lobbies[currentLobby];
       }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby.clients[0].ws === ws) {
-        lobby.clients[0].ws.send(
-          JSON.stringify({ type: "turn", payload: true })
-        );
         lobby.clients.forEach((client) => {
           client.ws.send(
             JSON.stringify({ type: "gameStarted", payload: true })
           );
         });
+        lobby.clients[0].ws.send(
+          JSON.stringify({ type: "turn", payload: true })
+        );
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
