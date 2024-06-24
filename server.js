@@ -1,6 +1,7 @@
 const { WebSocketServer, WebSocket } = require("ws");
 const { createServer } = require("http");
 const { generateImage } = require("./imageGenerator");
+const { generateText } = require("./chatgpt");
 
 const server = createServer();
 const wss = new WebSocketServer({ server });
@@ -52,7 +53,9 @@ wss.on("connection", (ws) => {
 
       if (lobbies[currentLobby].clients.length === MAX_USERS) {
         try {
-          const imageData = await generateImage("girl");
+          const imageData = await generateImage(
+            "Woman drinking iced coffee while looking left at a cafe"
+          );
           lobbies[currentLobby].clients.forEach((client) => {
             client.ws.send(
               JSON.stringify({ type: "initialImage", payload: imageData })
@@ -79,7 +82,8 @@ wss.on("connection", (ws) => {
       const currentClient = lobby.clients[lobby.currentTurn];
       if (currentClient.ws === ws) {
         if (lobby.currentTurn === 0) {
-          lobby.originalMessage = parsedMessage.payload;
+          lobby.originalMessage =
+            "Woman drinking iced coffee while looking left at a cafe";
         }
         lobby.lastMessage = parsedMessage.payload;
 
@@ -90,7 +94,13 @@ wss.on("connection", (ws) => {
 
           if (lobby.currentTurn === 0) {
             const isCorrect = lobby.lastMessage === lobby.originalMessage;
-            lobby.clients.forEach((client) => {
+            console.log("call chatgpt");
+            const chatgptRes = await generateText(
+              lobby.originalMessage,
+              lobby.lastMessage
+            );
+
+            lobby.clients.forEach(async (client) => {
               client.ws.send(
                 JSON.stringify({
                   type: "result",
@@ -102,6 +112,10 @@ wss.on("connection", (ws) => {
                   type: "generatedImage",
                   payload: imageData,
                 })
+              );
+              console.log("chatgptRes//" + chatgptRes);
+              client.ws.send(
+                JSON.stringify({ type: "chatgpt", payload: chatgptRes })
               );
             });
           } else {

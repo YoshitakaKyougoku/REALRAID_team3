@@ -8,6 +8,7 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
+import Image from "next/image";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
@@ -47,6 +48,9 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [currentPlayer, setCurrentPlayer] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState("");
+  const [initialImage, setInitialImage] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [chatgpt, setChatgpt] = useState<string | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -88,6 +92,14 @@ export default function LobbyPlay({ params }: { params: any }) {
         console.log("Set current player:", parsedMessage.payload);
       } else if (parsedMessage.type === "error") {
         setError(parsedMessage.payload);
+      } else if (parsedMessage.type === "initialImage") {
+        setInitialImage(parsedMessage.payload);
+      } else if (parsedMessage.type === "generatedImage") {
+        setGeneratedImage(parsedMessage.payload);
+        console.log("set //" + chatgpt);
+      } else if (parsedMessage.type === "chatgpt") {
+        setChatgpt(parsedMessage.payload);
+        console.log("set chatgpt//" + chatgpt);
       }
     };
 
@@ -109,6 +121,24 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
         <Link href="/">トップに戻る</Link>
+        <p>お題</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${initialImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
+        <p>生成された画像</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${generatedImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
       </div>
     );
   }
@@ -126,6 +156,33 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
         <Timer userNumber={userNumber} totalTime={600} />
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
+        {initialImage && !previousMessage && (
+          <>
+            <p>お題</p>
+            <figure>
+              <Image
+                src={`data:image/png;base64,${initialImage}`}
+                alt="Received Data"
+                width={512}
+                height={512}
+              />
+            </figure>
+          </>
+        )}
+        {initialImage && previousMessage && (
+          <>
+            <div className="text-lg">前のメッセージ: {previousMessage}</div>
+            <p>生成された画像</p>
+            <figure>
+              <Image
+                src={`data:image/png;base64,${generatedImage}`}
+                alt="Received Data"
+                width={512}
+                height={512}
+              />
+            </figure>
+          </>
+        )}
       </div>
     );
   }
