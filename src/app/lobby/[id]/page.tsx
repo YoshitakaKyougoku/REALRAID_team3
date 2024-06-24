@@ -135,6 +135,25 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
         <Link href="/">トップに戻る</Link>
+        {chatgpt}
+        <p>お題</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${initialImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
+        <p>生成された画像</p>
+        <figure>
+          <Image
+            src={`data:image/png;base64,${generatedImage}`}
+            alt="Received Data"
+            width={512}
+            height={512}
+          />
+        </figure>
       </div>
     );
   }
