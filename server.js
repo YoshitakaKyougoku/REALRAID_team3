@@ -20,12 +20,14 @@ wss.on("error", (error) => {
 wss.on("connection", (ws) => {
   let currentLobby = null;
   let userNumber = null;
+  let userName = null;
 
   // クライアントからメッセージが送られてきた時に呼ばれる
   ws.on("message", async (message) => {
     const parsedMessage = JSON.parse(message.toString());
     if (parsedMessage.type === "join") {
       currentLobby = parsedMessage.payload.lobby;
+      userName = parsedMessage.payload.userName;
       if (!lobbies[currentLobby]) {
         lobbies[currentLobby] = {
           clients: [],
@@ -41,41 +43,46 @@ wss.on("connection", (ws) => {
         return;
       }
       userNumber = lobbies[currentLobby].clients.length + 1;
-      lobbies[currentLobby].clients.push({ ws, userNumber });
+      lobbies[currentLobby].clients.push({ ws, userNumber, userName });
       ws.send(JSON.stringify({ type: "number", payload: userNumber }));
 
       const users = lobbies[currentLobby].clients.map(
-        (client) => client.userNumber
+        (client) => client.userName
       );
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
 
-      if (lobbies[currentLobby].clients.length === MAX_USERS) {
-        try {
-          const imageData = await generateImage(
-            "Woman drinking iced coffee while looking left at a cafe"
+      // ユーザー番号1に権限を付与
+      if (lobbies[currentLobby].clients.length === 1) {
+        lobbies[currentLobby].clients[0].ws.send(
+          JSON.stringify({ type: "authority", payload: true })
+        );
+      }
+
+      // ユーザーが4人以上になったら、エラーを返す
+      // if (lobbies[currentLobby].clients.length === MAX_USERS) {
+      //   lobbies[currentLobby].clients[0].ws.send(
+      //     JSON.stringify({ type: "turn", payload: true })
+      //   );
+      // }
+    } else if (parsedMessage.type === "startGame" && currentLobby) {
+      const lobby = lobbies[currentLobby];
+      const imageData = await generateImage(
+        "Woman drinking iced coffee while looking left at a cafe"
+      );
+      if (lobby.clients[0].ws === ws) {
+        lobby.clients[0].ws.send(
+          JSON.stringify({ type: "turn", payload: true })
+        );
+        lobby.clients.forEach((client) => {
+          client.ws.send(
+            JSON.stringify({ type: "gameStarted", payload: true })
           );
-          lobbies[currentLobby].clients.forEach((client) => {
-            client.ws.send(
-              JSON.stringify({ type: "initialImage", payload: imageData })
-            );
-            client.ws.send(JSON.stringify({ type: "playing" }));
-          });
-          // プレイヤー1のターンを最初に設定
-          lobbies[currentLobby].clients[0].ws.send(
-            JSON.stringify({ type: "turn", payload: true })
+          client.ws.send(
+            JSON.stringify({ type: "initialImage", payload: imageData })
           );
-        } catch (error) {
-          lobbies[currentLobby].clients.forEach((client) => {
-            client.ws.send(
-              JSON.stringify({
-                type: "error",
-                payload: "画像の生成に失敗しました。",
-              })
-            );
-          });
-        }
+        });
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
@@ -138,12 +145,11 @@ wss.on("connection", (ws) => {
               payload: "画像の生成に失敗しました。",
             })
           );
-          // すべてのクライアントに現在プレイしているユーザーを送信
           lobby.clients.forEach((client) => {
             client.ws.send(
               JSON.stringify({
                 type: "currentPlayer",
-                payload: lobby.clients[lobby.currentTurn].userNumber,
+                payload: nextClient.userName,
               })
             );
           });
@@ -152,11 +158,11 @@ wss.on("connection", (ws) => {
     } else if (parsedMessage.type === "getCurrentPlayer" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby) {
-        const currentPlayerNumber = lobby.clients[lobby.currentTurn].userNumber;
+        const currentPlayer = lobby.clients[lobby.currentTurn].userName;
         ws.send(
           JSON.stringify({
             type: "currentPlayer",
-            payload: currentPlayerNumber,
+            payload: currentPlayer,
           })
         );
       }
