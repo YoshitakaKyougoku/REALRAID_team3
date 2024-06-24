@@ -9,6 +9,7 @@ import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
 import { LobbyContext } from "@/provider/lobby";
+import { useSearchParams } from "next/navigation";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
@@ -24,7 +25,8 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [result, setResult] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const ws = useRef<WebSocket | null>(null);
-  const userName = new URLSearchParams(window.location.search).get("userName");
+  const searchParams = useSearchParams()
+  const userName = searchParams.get("userName");
 
   useEffect(() => {
     if (!lobbyId) return;
