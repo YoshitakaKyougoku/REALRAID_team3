@@ -14,7 +14,7 @@ import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import ExitLobby from "@/features/lobby/components/ExitLobby";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export const LobbyContext = createContext<{
   users: string[];
@@ -70,11 +70,8 @@ export default function LobbyPlay({ params }: { params: any }) {
         setUsers(parsedMessage.payload);
         console.log("Set users:", parsedMessage.payload);
         getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
-      } else if (parsedMessage.type === "shuffle") {
-        setUsers(parsedMessage.payload);
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(parsedMessage.payload);
-        console.log("Set is my turn:", parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
         setInput(parsedMessage.payload);
@@ -88,12 +85,11 @@ export default function LobbyPlay({ params }: { params: any }) {
       } else if (parsedMessage.type === "gameStarted") {
         setGameStarted(parsedMessage.payload);
         console.log("Game started:", parsedMessage.payload);
-      } else if (parsedMessage.type === "change") {
-        setUsers(parsedMessage.payload);
       }
     };
 
     return () => {
+      console.log("Closing connection");
       ws.current?.close();
     };
   }, [lobbyId, userName]);
@@ -115,7 +111,6 @@ export default function LobbyPlay({ params }: { params: any }) {
   const startGame = () => {
     if (ws.current) {
       ws.current.send(JSON.stringify({ type: "startGame" }));
-      setGameStarted(true);
     }
   };
 

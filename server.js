@@ -45,14 +45,6 @@ wss.on("connection", (ws) => {
       const exitUser = parsedMessage.payload;
       const lobby = lobbies[currentLobby];
 
-      const exitingClient = lobby.clients.find(
-        (client) => client.userNumber === exitUser
-      );
-
-      if (!exitingClient) return; // If no such user exists, exit early
-
-      const exitUserNumber = exitingClient.userNumber;
-
       lobby.clients = lobby.clients.filter(
         (client) => client.userNumber !== exitUser
       );
@@ -74,14 +66,14 @@ wss.on("connection", (ws) => {
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby.clients[0].ws === ws) {
+        lobby.clients[0].ws.send(
+          JSON.stringify({ type: "turn", payload: true })
+        );
         lobby.clients.forEach((client) => {
           client.ws.send(
             JSON.stringify({ type: "gameStarted", payload: true })
           );
         });
-        lobby.clients[0].ws.send(
-          JSON.stringify({ type: "turn", payload: true })
-        );
       }
     } else if (parsedMessage.type === "message" && currentLobby) {
       const lobby = lobbies[currentLobby];
