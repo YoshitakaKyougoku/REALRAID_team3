@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
+import { BiLogOut } from "react-icons/bi";
 
 const ExitLobby = () => {
   const router = useRouter();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const showModal = () => {
-    setModalVisible(true);
+    setModalOpen(true);
   };
 
   const hideModal = () => {
     console.log("キャンセルしました");
-    setModalVisible(false);
+    setModalOpen(false);
   };
 
   const handleExit = () => {
@@ -23,10 +24,10 @@ const ExitLobby = () => {
 
   return (
     <div className={styles.lobby}>
-      <button onClick={showModal} className={styles.exitButton}>
-        ロビー退出
+      <button onClick={showModal} className={styles.buttonIcon}>
+        <BiLogOut />
       </button>
-      {modalVisible && (
+      {modalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <p className={styles.titleText}>本当にホームに戻りますか？</p>

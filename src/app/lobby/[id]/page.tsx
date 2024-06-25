@@ -7,7 +7,7 @@ import Waiting from "@/features/play/components/Waiting";
 import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
-import ExitLobby from "@/features/lobby/components/ExitLobby";
+import Header from "@/features/lobby/components/Header";
 import { LobbyContext } from "@/provider/lobby";
 import { useSearchParams } from "next/navigation";
 
@@ -145,7 +145,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <ExitLobby />
+        <Header />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
           users={users}
