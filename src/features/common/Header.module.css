@@ -1,0 +1,35 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.icon {
+  font-size: 24px;
+  color: #495057;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #495057;
+  text-align: center;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+  }
+
+  .icon {
+    font-size: 20px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+}

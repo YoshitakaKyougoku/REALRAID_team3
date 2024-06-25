@@ -1,19 +1,13 @@
 "use client";
-import {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  Dispatch,
-  SetStateAction,
-} from "react";
+
+import React, { useState, useEffect, useRef, createContext, SetStateAction, Dispatch } from "react";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
 import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
-import ExitLobby from "@/features/lobby/components/ExitLobby";
+import Header from "@/features/lobby/components/Header";
 import { useSearchParams } from "next/navigation";
 
 export const LobbyContext = createContext<{
@@ -69,7 +63,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
         console.log("Set users:", parsedMessage.payload);
-        getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
+        getCurrentPlayer(); 
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
@@ -171,7 +165,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <ExitLobby ws={ws.current} userNumber={userNumber} />
+        <Header />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
           users={users}

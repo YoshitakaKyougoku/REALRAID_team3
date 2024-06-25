@@ -134,6 +134,19 @@ wss.on("connection", (ws) => {
       lobbies[currentLobby].clients = lobbies[currentLobby].clients.filter(
         (client) => client.ws !== ws
       );
+
+      // Update user numbers and user list for remaining clients
+      lobbies[currentLobby].clients.forEach((client, index) => {
+        client.userNumber = index + 1;
+      });
+
+      const users = lobbies[currentLobby].clients.map(
+        (client) => client.userName
+      );
+      lobbies[currentLobby].clients.forEach((client) => {
+        client.ws.send(JSON.stringify({ type: "userList", payload: users }));
+      });
+
       if (lobbies[currentLobby].clients.length === 0) {
         delete lobbies[currentLobby];
       }

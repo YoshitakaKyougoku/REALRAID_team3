@@ -1,53 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import styles from "./homePage.module.css";
 import InputUsername from "@/features/home/components/InputUsername";
+import Header from "@/features/home/components/Header";
+import CreateLobby from "@/features/home/components/CreateLobby";
+import JoinLobby from "@/features/home/components/JoinLobby";
 
 export default function Home() {
   const [lobbyId, setLobbyId] = useState("");
   const [username, setUsername] = useState("");
-  const router = useRouter();
-
-  const createLobby = () => {
-    const newLobbyId = Math.random().toString(36).substring(2, 7);
-    if (username) {
-      router.push(
-        `/lobby/${newLobbyId}?userName=${encodeURIComponent(username)}`
-      );
-    }
-  };
-
-  const joinLobby = () => {
-    if (lobbyId && username) {
-      router.push(`/lobby/${lobbyId}?userName=${encodeURIComponent(username)}`);
-    }
-  };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <h1 className="text-4xl font-bold mb-4">伝言ゲーム</h1>
-      <InputUsername username={username} setUsername={setUsername} />
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded shadow"
-        onClick={createLobby}
-      >
-        ロビーを作成
-      </button>
-      <div className="flex space-x-2">
-        <input
-          type="text"
-          value={lobbyId}
-          onChange={(e) => setLobbyId(e.target.value)}
-          placeholder="ロビーIDを入力"
-          className="border px-2 py-1 rounded"
-        />
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded shadow"
-          onClick={joinLobby}
-        >
-          ロビーに入る
-        </button>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <Header />
+      </div>
+      <h1 className={styles.title}>伝言ゲーム</h1>
+      <div className={styles.inputContainer}>
+        <InputUsername username={username} setUsername={setUsername} />
+      </div>
+      <div className={styles.buttonContainer}>
+        <div className={styles.button}>
+          <CreateLobby username={username}  />
+        </div>
+        <div className={styles.button}>
+          <JoinLobby username={username} />
+        </div>
       </div>
     </div>
   );

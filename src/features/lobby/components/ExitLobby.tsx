@@ -1,6 +1,7 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
+import { BiLogOut } from "react-icons/bi";
 import { LobbyContext } from "@/app/lobby/[id]/page";
 
 interface ExitProps {
@@ -10,7 +11,7 @@ interface ExitProps {
 
 const ExitLobby: FC<ExitProps> = ({ ws, userNumber }) => {
   const router = useRouter();
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const { setUsers } = useContext(LobbyContext);
 
   useEffect(() => {
@@ -25,12 +26,12 @@ const ExitLobby: FC<ExitProps> = ({ ws, userNumber }) => {
   }, [ws, setUsers]);
 
   const showModal = () => {
-    setModalVisible(true);
+    setModalOpen(true);
   };
 
   const hideModal = () => {
     console.log("キャンセルしました");
-    setModalVisible(false);
+    setModalOpen(false);
   };
 
   const handleExit = () => {
@@ -42,10 +43,10 @@ const ExitLobby: FC<ExitProps> = ({ ws, userNumber }) => {
 
   return (
     <div className={styles.lobby}>
-      <button onClick={showModal} className={styles.exitButton}>
-        ロビー退出
+      <button onClick={showModal} className={styles.buttonIcon}>
+        <BiLogOut />
       </button>
-      {modalVisible && (
+      {modalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <p className={styles.titleText}>本当にホームに戻りますか？</p>
