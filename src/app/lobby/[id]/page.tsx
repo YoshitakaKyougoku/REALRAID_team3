@@ -15,6 +15,7 @@ import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
+import ChangeNextUser from "@/features/play/components/ChangeNextUser";
 import { useSearchParams } from "next/navigation";
 
 export const LobbyContext = createContext<{
@@ -49,6 +50,9 @@ export default function LobbyPlay({ params }: { params: any }) {
   const ws = useRef<WebSocket | null>(null);
   const searchParams = useSearchParams();
   const userName = searchParams.get("userName");
+  const [timeChangeNextPlayer, setTimeChangeNextPlayer] = useState<number>(0);
+  const [showChangeNextUser, setShowChangeNextUser] = useState(false);
+
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -95,6 +99,26 @@ export default function LobbyPlay({ params }: { params: any }) {
     };
   }, [lobbyId, userName]);
 
+  // 次のプレーヤーに遷移する前にカウントダウンを表示
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    if (isMyTurn) {
+      setTimeChangeNextPlayer(5); // 秒数を設定
+      setShowChangeNextUser(true); 
+      timerId = setInterval(() => {
+        setTimeChangeNextPlayer((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timerId);
+            setShowChangeNextUser(false); 
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerId);
+  }, [isMyTurn]);
+
   const sendMessage = () => {
     if (ws.current && input && isMyTurn) {
       ws.current.send(JSON.stringify({ type: "message", payload: input }));
@@ -129,6 +153,15 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div>
         <Error error={error} />
       </div>
+    );
+  }
+
+  if (showChangeNextUser && timeChangeNextPlayer > 0) {
+    return (
+      <ChangeNextUser
+        timeChangeNextPlayer={timeChangeNextPlayer}
+        currentPlayer={currentPlayer}
+      />
     );
   }
 
