@@ -54,20 +54,28 @@ wss.on("connection", (ws) => {
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
+    } else if (parsedMessage.type === "exit" && currentLobby) {
+      const exitUser = parsedMessage.payload;
+      const lobby = lobbies[currentLobby];
 
-      // ユーザー番号1に権限を付与
-      if (lobbies[currentLobby].clients.length === 1) {
-        lobbies[currentLobby].clients[0].ws.send(
-          JSON.stringify({ type: "authority", payload: true })
-        );
+      lobby.clients = lobby.clients.filter(
+        (client) => client.userNumber !== exitUser
+      );
+
+      // 更新後のuserNumberを再設定
+      lobby.clients.forEach((client, index) => {
+        client.userNumber = index + 1;
+      });
+
+      const users = lobby.clients.map((client) => client.userName);
+
+      lobby.clients.forEach((client) => {
+        client.ws.send(JSON.stringify({ type: "userList", payload: users }));
+      });
+
+      if (lobby.clients.length === 0) {
+        delete lobbies[currentLobby];
       }
-
-      // ユーザーが4人以上になったら、エラーを返す
-      // if (lobbies[currentLobby].clients.length === MAX_USERS) {
-      //   lobbies[currentLobby].clients[0].ws.send(
-      //     JSON.stringify({ type: "turn", payload: true })
-      //   );
-      // }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
       const initialPrompt = await generatePrompt();
@@ -191,6 +199,19 @@ wss.on("connection", (ws) => {
       lobbies[currentLobby].clients = lobbies[currentLobby].clients.filter(
         (client) => client.ws !== ws
       );
+
+      // Update user numbers and user list for remaining clients
+      lobbies[currentLobby].clients.forEach((client, index) => {
+        client.userNumber = index + 1;
+      });
+
+      const users = lobbies[currentLobby].clients.map(
+        (client) => client.userName
+      );
+      lobbies[currentLobby].clients.forEach((client) => {
+        client.ws.send(JSON.stringify({ type: "userList", payload: users }));
+      });
+
       if (lobbies[currentLobby].clients.length === 0) {
         delete lobbies[currentLobby];
       }

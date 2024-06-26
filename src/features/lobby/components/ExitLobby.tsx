@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
 import { BiLogOut } from "react-icons/bi";
+import { LobbyContext } from "@/app/lobby/[id]/page";
 
-const ExitLobby = () => {
+interface ExitProps {
+  ws: WebSocket | null;
+  userNumber: number | null;
+}
+
+const ExitLobby: FC<ExitProps> = ({ ws, userNumber }) => {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
+  const { setUsers } = useContext(LobbyContext);
+
+  useEffect(() => {
+    if (ws) {
+      ws.onmessage = (message) => {
+        const parsedMessage = JSON.parse(message.data);
+        if (parsedMessage.type === "userList") {
+          setUsers(parsedMessage.payload);
+        }
+      };
+    }
+  }, [ws, setUsers]);
 
   const showModal = () => {
     setModalOpen(true);
@@ -18,6 +36,7 @@ const ExitLobby = () => {
 
   const handleExit = () => {
     console.log("ホームに戻ります");
+    ws?.send(JSON.stringify({ type: "exit", payload: userNumber }));
     router.push("/");
     hideModal();
   };
