@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface ShowCurrentPlayerProps {
   lobbyId: string;
@@ -6,6 +6,7 @@ interface ShowCurrentPlayerProps {
   userNumber: number | null;
   isHost: boolean;
   startGame: () => void;
+  start: boolean;
 }
 
 const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
@@ -14,6 +15,7 @@ const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
   userNumber,
   isHost,
   startGame,
+  start,
 }) => {
   return (
     <div>
@@ -33,6 +35,7 @@ const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
           ゲーム開始
         </button>
       )}
+      {start && <p>お題画像生成中...</p>}
     </div>
   );
 };
