@@ -9,6 +9,7 @@ import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
+import ChangeNextUser from "@/features/play/components/ChangeNextUser";
 import { useSearchParams } from "next/navigation";
 import { LobbyContext } from "@/provider/lobby";
 import { ShowImage } from "@/features/play/components/ShowImage";
@@ -32,6 +33,9 @@ export default function LobbyPlay({ params }: { params: any }) {
   const ws = useRef<WebSocket | null>(null);
   const searchParams = useSearchParams();
   const userName = searchParams.get("userName");
+  const [timeChangeNextPlayer, setTimeChangeNextPlayer] = useState<number>(0);
+  const [showChangeNextUser, setShowChangeNextUser] = useState(false);
+
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -89,6 +93,26 @@ export default function LobbyPlay({ params }: { params: any }) {
     };
   }, [lobbyId, userName]);
 
+  // 次のプレーヤーに遷移する前にカウントダウンを表示
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    if (isMyTurn) {
+      setTimeChangeNextPlayer(5); // 秒数を設定
+      setShowChangeNextUser(true); 
+      timerId = setInterval(() => {
+        setTimeChangeNextPlayer((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timerId);
+            setShowChangeNextUser(false); 
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerId);
+  }, [isMyTurn]);
+
   const sendMessage = () => {
     if (ws.current && input && isMyTurn) {
       ws.current.send(JSON.stringify({ type: "message", payload: input }));
@@ -123,16 +147,25 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div>
         <Error error={error} />
       </div>
     );
   }
 
+  if (showChangeNextUser && timeChangeNextPlayer > 0) {
+    return (
+      <ChangeNextUser
+        timeChangeNextPlayer={timeChangeNextPlayer}
+        currentPlayer={currentPlayer}
+      />
+    );
+  }
+
   if (isMyTurn) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <Timer userName={userName} totalTime={600} />
+      <div>
+        <Timer userName={userName} totalTime={30} />
         <p>画像からプロンプトを予想して入力しましょう</p>
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
         {initialImage && !previousMessage && (
@@ -163,9 +196,7 @@ export default function LobbyPlay({ params }: { params: any }) {
           gameStarted,
         }}
       >
-        <div className="flex flex-col items-center justify-center h-screen space-y-4">
-          <Waiting currentPlayer={currentPlayer} />
-        </div>
+        <Waiting currentPlayer={currentPlayer} />
       </LobbyContext.Provider>
     );
   }
@@ -181,16 +212,14 @@ export default function LobbyPlay({ params }: { params: any }) {
         gameStarted,
       }}
     >
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <Header />
-        <ShowCurrentPlayer
-          lobbyId={lobbyId}
-          users={users}
-          userNumber={userNumber}
-          startGame={startGame}
-          start={gameStarted}
-        />
-      </div>
+      <Header />
+      <ShowCurrentPlayer
+        lobbyId={lobbyId}
+        users={users}
+        userNumber={userNumber}
+        startGame={startGame}
+        start={gameStarted}
+      />
     </LobbyContext.Provider>
   );
 }
