@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, createContext, SetStateAction, Dispatch } from "react";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
@@ -8,13 +8,28 @@ import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
-import { LobbyContext } from "@/provider/lobby";
 import { useSearchParams } from "next/navigation";
+
+export const LobbyContext = createContext<{
+  users: string[];
+  setUsers: Dispatch<SetStateAction<string[]>>;
+  isMyTurn: boolean;
+  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+  sendMessage: () => void;
+  getCurrentPlayer: () => void;
+}>(
+  {} as {
+    users: string[];
+    setUsers: Dispatch<SetStateAction<string[]>>;
+    isMyTurn: boolean;
+    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
+    sendMessage: () => void;
+    getCurrentPlayer: () => void;
+  }
+);
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
-  const [isHost, setIsHost] = useState(false); // ホストかどうか
-  const [start, setStart] = useState(false);
   const [users, setUsers] = useState<string[]>([]);
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<string | null>("");
@@ -25,7 +40,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [result, setResult] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const ws = useRef<WebSocket | null>(null);
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const userName = searchParams.get("userName");
 
   useEffect(() => {
@@ -43,17 +58,12 @@ export default function LobbyPlay({ params }: { params: any }) {
 
     ws.current.onmessage = (message) => {
       const parsedMessage = JSON.parse(message.data);
-      if (parsedMessage.type === "authority") {
-        setIsHost(parsedMessage.payload);
-        console.log("Is host:", parsedMessage.payload);
-      } else if (parsedMessage.type === "number") {
+      if (parsedMessage.type === "number") {
         setUserNumber(parsedMessage.payload);
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
         console.log("Set users:", parsedMessage.payload);
-        getCurrentPlayer(); // プレイヤー一覧を受け取った後に現在のプレイヤーを取得
-      } else if (parsedMessage.type === "shuffle") {
-        setUsers(parsedMessage.payload);
+        getCurrentPlayer(); 
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
@@ -73,6 +83,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     };
 
     return () => {
+      console.log("Closing connection");
       ws.current?.close();
     };
   }, [lobbyId, userName]);
@@ -94,7 +105,6 @@ export default function LobbyPlay({ params }: { params: any }) {
   const startGame = () => {
     if (ws.current) {
       ws.current.send(JSON.stringify({ type: "startGame" }));
-      setStart(true);
     }
   };
 
@@ -103,6 +113,14 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="text-2xl font-bold">結果: {result}</div>
         <Link href="/">トップに戻る</Link>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <Error error={error} />
       </div>
     );
   }
@@ -121,6 +139,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       <LobbyContext.Provider
         value={{
           users,
+          setUsers,
           isMyTurn,
           setIsMyTurn,
           sendMessage,
@@ -138,6 +157,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     <LobbyContext.Provider
       value={{
         users,
+        setUsers,
         isMyTurn,
         setIsMyTurn,
         sendMessage,
@@ -150,7 +170,6 @@ export default function LobbyPlay({ params }: { params: any }) {
           lobbyId={lobbyId}
           users={users}
           userNumber={userNumber}
-          isHost={isHost}
           startGame={startGame}
         />
       </div>
