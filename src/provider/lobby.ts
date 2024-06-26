@@ -6,6 +6,7 @@ export const LobbyContext = createContext<{
     setIsMyTurn: Dispatch<SetStateAction<boolean>>;
     sendMessage: () => void;
     getCurrentPlayer: () => void;
+    gameStarted: boolean;
   }>(
     {} as {
       users: string[];
@@ -13,5 +14,6 @@ export const LobbyContext = createContext<{
       setIsMyTurn: Dispatch<SetStateAction<boolean>>;
       sendMessage: () => void;
       getCurrentPlayer: () => void;
+      gameStarted: boolean;
     }
   );

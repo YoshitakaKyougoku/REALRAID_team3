@@ -10,6 +10,9 @@ import Error from "@/features/play/components/Error";
 import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
 import { useSearchParams } from "next/navigation";
+import { LobbyContext } from "@/provider/lobby";
+import { ShowImage } from "@/features/play/components/ShowImage";
+import { GameResult } from "@/features/play/components/GameResult";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
@@ -18,14 +21,14 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [currentPlayer, setCurrentPlayer] = useState<string | null>("");
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const [initialImage, setInitialImage] = useState<string | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [initialImage, setInitialImage] = useState<string>("");
+  const [generatedImage, setGeneratedImage] = useState<string>("");
   const [chatgpt, setChatgpt] = useState<string | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const [initialPrompt, setInitialPrompt] = useState(false);
+  const [initialPrompt, setInitialPrompt] = useState("");
   const ws = useRef<WebSocket | null>(null);
   const searchParams = useSearchParams();
   const userName = searchParams.get("userName");
@@ -50,7 +53,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       } else if (parsedMessage.type === "userList") {
         setUsers(parsedMessage.payload);
         console.log("Set users:", parsedMessage.payload);
-        getCurrentPlayer(); 
+        getCurrentPlayer();
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
@@ -108,30 +111,13 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (result !== null) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <Link href="/">トップに戻る</Link>
-        <p>ChatGPTによる評価：{chatgpt}</p>
-        <p>お題</p>
-        <p>{initialPrompt}</p>
-        <figure>
-          <Image
-            src={`data:image/png;base64,${initialImage}`}
-            alt="Received Data"
-            width={300}
-            height={300}
-          />
-        </figure>
-        <p>生成された画像</p>
-        <p>{previousMessage}</p>
-        <figure>
-          <Image
-            src={`data:image/png;base64,${generatedImage}`}
-            alt="Received Data"
-            width={300}
-            height={300}
-          />
-        </figure>
-      </div>
+      <GameResult
+        chatgpt={chatgpt}
+        initialPrompt={initialPrompt}
+        initialImage={initialImage}
+        previousMessage={previousMessage}
+        generatedImage={generatedImage}
+      />
     );
   }
 
@@ -148,32 +134,17 @@ export default function LobbyPlay({ params }: { params: any }) {
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
         <Timer userName={userName} totalTime={600} />
         <p>画像からプロンプトを予想して入力しましょう</p>
-        <p>入力例：公園で本を読んでいるメガネをかけた青年</p>
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
         {initialImage && !previousMessage && (
           <>
             <p>お題</p>
-            <figure>
-              <Image
-                src={`data:image/png;base64,${initialImage}`}
-                alt="Received Data"
-                width={300}
-                height={300}
-              />
-            </figure>
+            <ShowImage imageData={initialImage} />
           </>
         )}
         {initialImage && previousMessage && (
           <>
             <p>生成された画像</p>
-            <figure>
-              <Image
-                src={`data:image/png;base64,${generatedImage}`}
-                alt="Received Data"
-                width={300}
-                height={300}
-              />
-            </figure>
+            <ShowImage imageData={generatedImage} />
           </>
         )}
       </div>
@@ -185,11 +156,11 @@ export default function LobbyPlay({ params }: { params: any }) {
       <LobbyContext.Provider
         value={{
           users,
-          setUsers,
           isMyTurn,
           setIsMyTurn,
           sendMessage,
           getCurrentPlayer,
+          gameStarted,
         }}
       >
         <div className="flex flex-col items-center justify-center h-screen space-y-4">
@@ -203,11 +174,11 @@ export default function LobbyPlay({ params }: { params: any }) {
     <LobbyContext.Provider
       value={{
         users,
-        setUsers,
         isMyTurn,
         setIsMyTurn,
         sendMessage,
         getCurrentPlayer,
+        gameStarted,
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
@@ -217,7 +188,7 @@ export default function LobbyPlay({ params }: { params: any }) {
           users={users}
           userNumber={userNumber}
           startGame={startGame}
-          start={start}
+          start={gameStarted}
         />
       </div>
     </LobbyContext.Provider>

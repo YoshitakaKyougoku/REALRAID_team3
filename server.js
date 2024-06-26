@@ -1,9 +1,7 @@
 const { WebSocketServer, WebSocket } = require("ws");
 const { createServer } = require("http");
 const { generateImage } = require("./imageGenerator");
-const { generateAnswer } = require("./chatgpt");
-const { translate } = require("./chatgpt");
-const { generatePrompt } = require("./chatgpt");
+const { generateAnswer, translate, generatePrompt } = require("./chatgpt");
 
 const server = createServer();
 const wss = new WebSocketServer({ server });
@@ -102,7 +100,6 @@ wss.on("connection", (ws) => {
       const currentClient = lobby.clients[lobby.currentTurn];
       if (currentClient.ws === ws) {
         if (lobby.currentTurn === 0) {
-          
         }
         lobby.lastMessage = parsedMessage.payload;
 
