@@ -141,8 +141,8 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (result !== null) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <div className="text-2xl font-bold">結果: {result}</div>
+      <div>
+        <div>結果: {result}</div>
         <Link href="/">トップに戻る</Link>
       </div>
     );
@@ -150,7 +150,7 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div>
         <Error error={error} />
       </div>
     );
@@ -167,8 +167,8 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (isMyTurn) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <Timer userName={userName} totalTime={600} />
+      <div>
+        <Timer userName={userName} totalTime={30} />
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
       </div>
     );
@@ -186,9 +186,7 @@ export default function LobbyPlay({ params }: { params: any }) {
           getCurrentPlayer,
         }}
       >
-        <div className="flex flex-col items-center justify-center h-screen space-y-4">
-          <Waiting currentPlayer={currentPlayer} />
-        </div>
+        <Waiting currentPlayer={currentPlayer} />
       </LobbyContext.Provider>
     );
   }
@@ -204,16 +202,13 @@ export default function LobbyPlay({ params }: { params: any }) {
         getCurrentPlayer,
       }}
     >
-      <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <Header />
-        <ShowCurrentPlayer
-          lobbyId={lobbyId}
-          users={users}
-          userNumber={userNumber}
-          startGame={startGame}
-          isHost={false}
-        />
-      </div>
+      <Header />
+      <ShowCurrentPlayer
+        lobbyId={lobbyId}
+        users={users}
+        userNumber={userNumber}
+        startGame={startGame}
+      />
     </LobbyContext.Provider>
   );
 }
