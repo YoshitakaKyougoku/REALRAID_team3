@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
@@ -15,23 +8,9 @@ import Waiting from "@/features/play/components/Waiting";
 import ShowCurrentPlayer from "@/features/lobby/components/ShowCurrentPlayer";
 import Error from "@/features/play/components/Error";
 import Link from "next/link";
-import ExitLobby from "@/features/lobby/components/ExitLobby";
-
-export const LobbyContext = createContext<{
-  users: string[];
-  isMyTurn: boolean;
-  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-  sendMessage: () => void;
-  getCurrentPlayer: () => void;
-}>(
-  {} as {
-    users: string[];
-    isMyTurn: boolean;
-    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-    sendMessage: () => void;
-    getCurrentPlayer: () => void;
-  }
-);
+import Header from "@/features/lobby/components/Header";
+import { LobbyContext } from "@/provider/lobby";
+import { useSearchParams } from "next/navigation";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
@@ -51,7 +30,8 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [initialPrompt, setInitialPrompt] = useState(false);
   const ws = useRef<WebSocket | null>(null);
-  const userName = new URLSearchParams(window.location.search).get("userName");
+  const searchParams = useSearchParams()
+  const userName = searchParams.get("userName");
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -229,7 +209,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       }}
     >
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
-        <ExitLobby />
+        <Header />
         <ShowCurrentPlayer
           lobbyId={lobbyId}
           users={users}

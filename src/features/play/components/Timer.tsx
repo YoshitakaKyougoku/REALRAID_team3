@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./Timer.module.css";
-import { LobbyContext } from "@/app/lobby/[id]/page";
+import { LobbyContext } from "@/provider/lobby";
 
 interface TimerProps {
   userName: string | null;
