@@ -131,6 +131,12 @@ wss.on("connection", (ws) => {
                   payload: lobby.originalMessage,
                 })
               );
+              client.ws.send(
+                JSON.stringify({
+                  type: "previousMessage",
+                  payload: lobby.lastMessage,
+                })
+              );
               console.log("chatgptRes//" + chatgptRes);
               client.ws.send(
                 JSON.stringify({ type: "chatgpt", payload: chatgptRes })

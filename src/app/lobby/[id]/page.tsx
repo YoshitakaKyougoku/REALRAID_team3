@@ -30,7 +30,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [initialPrompt, setInitialPrompt] = useState(false);
   const ws = useRef<WebSocket | null>(null);
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const userName = searchParams.get("userName");
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function LobbyPlay({ params }: { params: any }) {
         setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
         setPreviousMessage(parsedMessage.payload);
-        setInput(parsedMessage.payload);
+        setInput("");
       } else if (parsedMessage.type === "result") {
         setResult(parsedMessage.payload ? "正解！" : "不正解！");
       } else if (parsedMessage.type === "currentPlayer") {
@@ -74,7 +74,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       } else if (parsedMessage.type === "initialImage") {
         setInitialImage(parsedMessage.payload);
       } else if (parsedMessage.type === "initialPrompt") {
-        console.log(initialPrompt)
+        console.log(initialPrompt);
         setInitialPrompt(parsedMessage.payload);
       } else if (parsedMessage.type === "generatedImage") {
         setGeneratedImage(parsedMessage.payload);
@@ -117,27 +117,26 @@ export default function LobbyPlay({ params }: { params: any }) {
   if (result !== null) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <div className="text-2xl font-bold">結果: {result}</div>
         <Link href="/">トップに戻る</Link>
-        {chatgpt}
+        <p>ChatGPTによる評価：{chatgpt}</p>
         <p>お題</p>
-        {initialPrompt}
+        <p>{initialPrompt}</p>
         <figure>
           <Image
             src={`data:image/png;base64,${initialImage}`}
             alt="Received Data"
-            width={512}
-            height={512}
+            width={300}
+            height={300}
           />
         </figure>
         <p>生成された画像</p>
-        {previousMessage}
+        <p>{previousMessage}</p>
         <figure>
           <Image
             src={`data:image/png;base64,${generatedImage}`}
             alt="Received Data"
-            width={512}
-            height={512}
+            width={300}
+            height={300}
           />
         </figure>
       </div>
@@ -148,6 +147,8 @@ export default function LobbyPlay({ params }: { params: any }) {
     return (
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
         <Timer userName={userName} totalTime={600} />
+        <p>画像からプロンプトを予想して入力しましょう</p>
+        <p>入力例：公園で本を読んでいるメガネをかけた青年</p>
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
         {initialImage && !previousMessage && (
           <>
@@ -156,22 +157,21 @@ export default function LobbyPlay({ params }: { params: any }) {
               <Image
                 src={`data:image/png;base64,${initialImage}`}
                 alt="Received Data"
-                width={512}
-                height={512}
+                width={300}
+                height={300}
               />
             </figure>
           </>
         )}
         {initialImage && previousMessage && (
           <>
-            <div className="text-lg">前のメッセージ: {previousMessage}</div>
             <p>生成された画像</p>
             <figure>
               <Image
                 src={`data:image/png;base64,${generatedImage}`}
                 alt="Received Data"
-                width={512}
-                height={512}
+                width={300}
+                height={300}
               />
             </figure>
           </>
@@ -216,6 +216,7 @@ export default function LobbyPlay({ params }: { params: any }) {
           userNumber={userNumber}
           isHost={isHost}
           startGame={startGame}
+          start={start}
         />
       </div>
     </LobbyContext.Provider>
