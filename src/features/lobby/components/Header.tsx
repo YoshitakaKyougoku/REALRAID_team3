@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div >
-        <ExitLobby />
+        <ExitLobby ws={null} userNumber={null} />
       </div>
       <div className={styles.title}>ゲームタイトル</div>
       <div className={styles.icon}>

@@ -36,7 +36,6 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [timeChangeNextPlayer, setTimeChangeNextPlayer] = useState<number>(0);
   const [showChangeNextUser, setShowChangeNextUser] = useState(false);
 
-
   useEffect(() => {
     if (!lobbyId) return;
 
@@ -98,12 +97,12 @@ export default function LobbyPlay({ params }: { params: any }) {
     let timerId: NodeJS.Timeout;
     if (isMyTurn) {
       setTimeChangeNextPlayer(5); // 秒数を設定
-      setShowChangeNextUser(true); 
+      setShowChangeNextUser(true);
       timerId = setInterval(() => {
         setTimeChangeNextPlayer((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerId);
-            setShowChangeNextUser(false); 
+            setShowChangeNextUser(false);
             return 0;
           }
           return prevTime - 1;
@@ -165,7 +164,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   if (isMyTurn) {
     return (
       <div>
-        <Timer userName={userName} totalTime={30} />
+        <Timer userName={userName} totalTime={15} sendMessage={sendMessage} />
         <p>画像からプロンプトを予想して入力しましょう</p>
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
         {initialImage && !previousMessage && (
@@ -214,7 +213,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     >
       <Header />
       <ShowCurrentPlayer
-        lobbyId={lobbyId}
+        lobbyId={lobbyId} 
         users={users}
         userNumber={userNumber}
         startGame={startGame}
