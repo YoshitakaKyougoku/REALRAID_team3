@@ -1,7 +1,7 @@
-const { WebSocketServer, WebSocket } = require("ws");
-const { createServer } = require("http");
-
-const server = createServer();
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app);
+const { WebSocketServer } = require('ws');
 const wss = new WebSocketServer({ server });
 
 const lobbies = {};

@@ -56,7 +56,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   useEffect(() => {
     if (!lobbyId) return;
 
-    ws.current = new WebSocket("ws://localhost:3001");
+    ws.current = new WebSocket("https://websocket-server-muj2.onrender.com");
     ws.current.onopen = () => {
       ws.current?.send(
         JSON.stringify({
