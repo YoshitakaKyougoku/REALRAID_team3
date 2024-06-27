@@ -8,7 +8,6 @@ import CreateLobby from "@/features/home/components/CreateLobby";
 import JoinLobby from "@/features/home/components/JoinLobby";
 
 export default function Home() {
-  const [lobbyId, setLobbyId] = useState("");
   const [username, setUsername] = useState("");
 
   return (
@@ -22,7 +21,7 @@ export default function Home() {
       </div>
       <div className={styles.buttonContainer}>
         <div className={styles.button}>
-          <CreateLobby username={username}  />
+          <CreateLobby username={username} />
         </div>
         <div className={styles.button}>
           <JoinLobby username={username} />

@@ -41,28 +41,6 @@ wss.on("connection", (ws) => {
       lobbies[currentLobby].clients.forEach((client) => {
         client.ws.send(JSON.stringify({ type: "userList", payload: users }));
       });
-    } else if (parsedMessage.type === "exit" && currentLobby) {
-      const exitUser = parsedMessage.payload;
-      const lobby = lobbies[currentLobby];
-
-      lobby.clients = lobby.clients.filter(
-        (client) => client.userNumber !== exitUser
-      );
-
-      // 更新後のuserNumberを再設定
-      lobby.clients.forEach((client, index) => {
-        client.userNumber = index + 1;
-      });
-
-      const users = lobby.clients.map((client) => client.userName);
-
-      lobby.clients.forEach((client) => {
-        client.ws.send(JSON.stringify({ type: "userList", payload: users }));
-      });
-
-      if (lobby.clients.length === 0) {
-        delete lobbies[currentLobby];
-      }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
       if (lobby.clients[0].ws === ws) {

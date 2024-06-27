@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./Timer.module.css";
-import { LobbyContext } from "@/provider/lobby";
+import { LobbyContext } from "@/app/context";
 
 interface TimerProps {
   userName: string | null;
   totalTime: number;
+  sendMessage: () => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ userName, totalTime }) => {
-  const { isMyTurn, setIsMyTurn, sendMessage } = useContext(LobbyContext);
+const Timer: React.FC<TimerProps> = ({ userName, totalTime, sendMessage }) => {
+  const { isMyTurn, setIsMyTurn } = useContext(LobbyContext);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(

@@ -6,7 +6,7 @@ import ExitLobby from "./ExitLobby";
 const Header = () => {
   return (
     <header className={styles.header}>
-      <div >
+      <div>
         <ExitLobby />
       </div>
       <div className={styles.title}>ゲームタイトル</div>

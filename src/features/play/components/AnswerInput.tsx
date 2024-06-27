@@ -1,12 +1,12 @@
-import React from "react";
+import { LobbyContext } from "@/app/context";
+import React, { useContext } from "react";
 
-type AnswerInputProps = {
-  input: string;
-  setInput: (input: string) => void;
+interface AnswerInputProps {
   onSend: () => void;
-};
+}
 
-const AnswerInput = ({ input, setInput, onSend }: AnswerInputProps) => {
+const AnswerInput = ({ onSend }: AnswerInputProps) => {
+  const { input, setInput } = useContext(LobbyContext);
   return (
     <div>
       <textarea

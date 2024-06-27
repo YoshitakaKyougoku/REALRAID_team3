@@ -1,13 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  SetStateAction,
-  Dispatch,
-} from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import AnswerInput from "@/features/play/components/AnswerInput";
 import Timer from "@/features/play/components/Timer";
 import Waiting from "@/features/play/components/Waiting";
@@ -17,42 +10,32 @@ import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
 import ChangeNextUser from "@/features/play/components/ChangeNextUser";
 import { useSearchParams } from "next/navigation";
-
-export const LobbyContext = createContext<{
-  users: string[];
-  setUsers: Dispatch<SetStateAction<string[]>>;
-  isMyTurn: boolean;
-  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-  sendMessage: () => void;
-  getCurrentPlayer: () => void;
-}>(
-  {} as {
-    users: string[];
-    setUsers: Dispatch<SetStateAction<string[]>>;
-    isMyTurn: boolean;
-    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-    sendMessage: () => void;
-    getCurrentPlayer: () => void;
-  }
-);
+import { LobbyContext } from "@/app/context";
 
 export default function LobbyPlay({ params }: { params: any }) {
-  const lobbyId = params.id;
-  const [users, setUsers] = useState<string[]>([]);
-  const [userNumber, setUserNumber] = useState<number | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<string | null>("");
+  const {
+    userNumber,
+    setUserNumber,
+    users,
+    setUsers,
+    isMyTurn,
+    setIsMyTurn,
+    input,
+    setInput,
+    currentPlayer,
+    setCurrentPlayer,
+  } = useContext(LobbyContext);
+
   const [error, setError] = useState<string | null>(null);
-  const [input, setInput] = useState("");
-  const [isMyTurn, setIsMyTurn] = useState(false);
-  const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
-  const ws = useRef<WebSocket | null>(null);
-  const searchParams = useSearchParams();
-  const userName = searchParams.get("userName");
   const [timeChangeNextPlayer, setTimeChangeNextPlayer] = useState<number>(0);
   const [showChangeNextUser, setShowChangeNextUser] = useState(false);
 
+  const ws = useRef<WebSocket | null>(null);
+  const lobbyId = params.id;
+  const searchParams = useSearchParams();
+  const userName = searchParams.get("userName");
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -78,7 +61,6 @@ export default function LobbyPlay({ params }: { params: any }) {
       } else if (parsedMessage.type === "turn") {
         setIsMyTurn(parsedMessage.payload);
       } else if (parsedMessage.type === "previousMessage") {
-        setPreviousMessage(parsedMessage.payload);
         setInput(parsedMessage.payload);
       } else if (parsedMessage.type === "result") {
         setResult(parsedMessage.payload ? "正解！" : "不正解！");
@@ -97,19 +79,27 @@ export default function LobbyPlay({ params }: { params: any }) {
       console.log("Closing connection");
       ws.current?.close();
     };
-  }, [lobbyId, userName]);
+  }, [
+    lobbyId,
+    userName,
+    setUserNumber,
+    setUsers,
+    setIsMyTurn,
+    setInput,
+    setCurrentPlayer,
+  ]);
 
   // 次のプレーヤーに遷移する前にカウントダウンを表示
   useEffect(() => {
     let timerId: NodeJS.Timeout;
     if (isMyTurn) {
       setTimeChangeNextPlayer(5); // 秒数を設定
-      setShowChangeNextUser(true); 
+      setShowChangeNextUser(true);
       timerId = setInterval(() => {
         setTimeChangeNextPlayer((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerId);
-            setShowChangeNextUser(false); 
+            setShowChangeNextUser(false);
             return 0;
           }
           return prevTime - 1;
@@ -149,11 +139,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   }
 
   if (error) {
-    return (
-      <div>
-        <Error error={error} />
-      </div>
-    );
+    return <Error error={error} />;
   }
 
   if (showChangeNextUser && timeChangeNextPlayer > 0) {
@@ -168,40 +154,18 @@ export default function LobbyPlay({ params }: { params: any }) {
   if (isMyTurn) {
     return (
       <div>
-        <Timer userName={userName} totalTime={30} />
-        <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
+        <Timer userName={userName} totalTime={30} sendMessage={sendMessage} />
+        <AnswerInput onSend={sendMessage} />
       </div>
     );
   }
 
   if (gameStarted && !isMyTurn) {
-    return (
-      <LobbyContext.Provider
-        value={{
-          users,
-          setUsers,
-          isMyTurn,
-          setIsMyTurn,
-          sendMessage,
-          getCurrentPlayer,
-        }}
-      >
-        <Waiting currentPlayer={currentPlayer} />
-      </LobbyContext.Provider>
-    );
+    return <Waiting currentPlayer={currentPlayer} />;
   }
 
   return (
-    <LobbyContext.Provider
-      value={{
-        users,
-        setUsers,
-        isMyTurn,
-        setIsMyTurn,
-        sendMessage,
-        getCurrentPlayer,
-      }}
-    >
+    <div>
       <Header />
       <ShowCurrentPlayer
         lobbyId={lobbyId}
@@ -209,6 +173,6 @@ export default function LobbyPlay({ params }: { params: any }) {
         userNumber={userNumber}
         startGame={startGame}
       />
-    </LobbyContext.Provider>
+    </div>
   );
 }
