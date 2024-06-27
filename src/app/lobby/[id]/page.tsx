@@ -42,7 +42,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   const [userNumber, setUserNumber] = useState<number | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<string | null>("");
   const [error, setError] = useState<string | null>(null);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(" ");
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [previousMessage, setPreviousMessage] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -52,7 +52,6 @@ export default function LobbyPlay({ params }: { params: any }) {
   const userName = searchParams.get("userName");
   const [timeChangeNextPlayer, setTimeChangeNextPlayer] = useState<number>(0);
   const [showChangeNextUser, setShowChangeNextUser] = useState(false);
-
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -104,12 +103,12 @@ export default function LobbyPlay({ params }: { params: any }) {
     let timerId: NodeJS.Timeout;
     if (isMyTurn) {
       setTimeChangeNextPlayer(5); // 秒数を設定
-      setShowChangeNextUser(true); 
+      setShowChangeNextUser(true);
       timerId = setInterval(() => {
         setTimeChangeNextPlayer((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerId);
-            setShowChangeNextUser(false); 
+            setShowChangeNextUser(false);
             return 0;
           }
           return prevTime - 1;
@@ -168,7 +167,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   if (isMyTurn) {
     return (
       <div>
-        <Timer userName={userName} totalTime={30} />
+        <Timer userName={userName} totalTime={15} sendMessage={sendMessage} />
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
       </div>
     );
@@ -204,7 +203,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     >
       <Header />
       <ShowCurrentPlayer
-        lobbyId={lobbyId}
+        lobbyId={lobbyId} 
         users={users}
         userNumber={userNumber}
         startGame={startGame}
