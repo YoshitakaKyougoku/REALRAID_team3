@@ -39,7 +39,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   useEffect(() => {
     if (!lobbyId) return;
 
-    ws.current = new WebSocket("https://realraid-team3.onrender.com:3001");
+    ws.current = new WebSocket("wss://realraid-team3.onrender.com:3001");
     ws.current.onopen = () => {
       ws.current?.send(
         JSON.stringify({
