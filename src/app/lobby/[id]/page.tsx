@@ -17,24 +17,7 @@ import Link from "next/link";
 import Header from "@/features/lobby/components/Header";
 import ChangeNextUser from "@/features/play/components/ChangeNextUser";
 import { useSearchParams } from "next/navigation";
-
-export const LobbyContext = createContext<{
-  users: string[];
-  setUsers: Dispatch<SetStateAction<string[]>>;
-  isMyTurn: boolean;
-  setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-  sendMessage: () => void;
-  getCurrentPlayer: () => void;
-}>(
-  {} as {
-    users: string[];
-    setUsers: Dispatch<SetStateAction<string[]>>;
-    isMyTurn: boolean;
-    setIsMyTurn: Dispatch<SetStateAction<boolean>>;
-    sendMessage: () => void;
-    getCurrentPlayer: () => void;
-  }
-);
+import { LobbyContext } from "@/provider/lobby";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;

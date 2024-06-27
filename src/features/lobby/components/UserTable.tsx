@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import styles from "./UserTable.module.css";
-import { LobbyContext } from "@/app/lobby/[id]/page";
+import { LobbyContext } from "@/provider/lobby";
 
 const UserTable: React.FC = () => {
   const { users } = useContext(LobbyContext);

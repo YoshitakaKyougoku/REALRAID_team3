@@ -2,7 +2,7 @@ import React, { FC, useContext, useEffect, useState } from "react";
 import styles from "./ExitLobby.module.css";
 import { useRouter } from "next/navigation";
 import { BiLogOut } from "react-icons/bi";
-import { LobbyContext } from "@/app/lobby/[id]/page";
+import { LobbyContext } from "@/provider/lobby";
 
 interface ExitProps {
   ws: WebSocket | null;
