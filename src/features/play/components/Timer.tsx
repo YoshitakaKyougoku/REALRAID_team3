@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./Timer.module.css";
-import { LobbyContext } from "@/provider/lobby";
 
 interface TimerProps {
   userName: string | null;
   totalTime: number;
+  sendMessage: () => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ userName, totalTime }) => {
-  const { isMyTurn, setIsMyTurn, sendMessage } = useContext(LobbyContext);
+const Timer: React.FC<TimerProps> = ({ userName, totalTime, sendMessage }) => {
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(
@@ -20,12 +19,13 @@ const Timer: React.FC<TimerProps> = ({ userName, totalTime }) => {
     setTimeLeft(totalTime);
     setProgressWidth(100);
     setProgressBarClass(styles.progressBarInfo);
-  }, [isMyTurn, totalTime]);
+  }, [totalTime]);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
+    console.log("timeLeft", timeLeft);
+    if (timeLeft === 0) {
+      console.log("timeLeft === 0");
       sendMessage();
-      setIsMyTurn(false); // ターンが終わるのでフラグを下げる
       return;
     }
 
@@ -49,7 +49,7 @@ const Timer: React.FC<TimerProps> = ({ userName, totalTime }) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, totalTime, setIsMyTurn, sendMessage]);
+  }, [timeLeft, totalTime, sendMessage]);
 
   return (
     <div>
