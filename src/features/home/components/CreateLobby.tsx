@@ -31,7 +31,11 @@ const CreateLobby = ({ username }: CreateLobbyProps) => {
 
   return (
     <div>
-      {username && <button onClick={showModal}>ロビーを作成</button>}
+      {username && (
+        <button className={styles.button} onClick={showModal}>
+          ロビーを作成
+        </button>
+      )}
       {modalOpen && (
         <div className={styles.modal} onClick={hideModal}>
           <div className={styles.modalContent}>

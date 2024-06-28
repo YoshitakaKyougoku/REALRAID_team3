@@ -1,20 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 10px 10px 10px 10px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
 }
 
 .icon {
-  font-size: 24px;
+  font-size: 48px;
   color: #495057;
 }
 
 .title {
   font-size: 18px;
   font-weight: bold;
+  font-family: "Press Start 2P", cursive;
+
   color: #495057;
   text-align: center;
   flex: 1;

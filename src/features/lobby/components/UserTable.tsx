@@ -6,22 +6,25 @@ const UserTable: React.FC = () => {
   const { users } = useContext(LobbyContext);
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          <th>順番</th>
-          <th>ユーザー名</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user, index) => (
-          <tr key={index}>
-            <td>{`${index + 1}`}</td>
-            <td>{user}</td>
+    <div className={styles.table_container}>
+      <div className={styles.title}>参加者一覧</div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>順番</th>
+            <th>ユーザー名</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {users.map((user, index) => (
+            <tr key={index} className={styles.user_row}>
+              <td>{`${index + 1}`}</td>
+              <td>{user}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

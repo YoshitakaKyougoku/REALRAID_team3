@@ -30,7 +30,7 @@ const JoinLobby = ({ username }: JoinLobbyProps) => {
 
   return (
     <div>
-      {username && <button onClick={showModal}>ロビーに入る</button>}
+      {username && <button className={styles.button} onClick={showModal}>ロビーに入る</button>}
       {modalOpen && (
         <div className={styles.modal} onClick={hideModal}>
           <div className={styles.modalContent}>
