@@ -1,13 +1,13 @@
 import React from "react";
 import styles from "./Header.module.css";
-import { FiHelpCircle } from "react-icons/fi";
+import TipsButton from "./TipsButton";
 
 const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.title}>Knock Prompt</div>
       <div className={styles.icon}>
-        <FiHelpCircle />
+        <TipsButton />
       </div>
     </header>
   );

@@ -6,6 +6,7 @@
   padding: 10px 20px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
+  height: 48px;
 }
 
 .icon {
@@ -15,8 +16,8 @@
 
 .title {
   font-size: 18px;
-
   font-weight: bold;
+  font-family: "Press Start 2P", cursive;
   color: #495057;
   text-align: center;
   flex: 1;
@@ -24,6 +25,7 @@
 
 @media (max-width: 768px) {
   .header {
+    height: 32px;
     padding: 10px;
   }
 
