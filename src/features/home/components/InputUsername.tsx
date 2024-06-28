@@ -13,8 +13,14 @@ const InputUsername: FC<InputUsernameProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        {!username && <p>はじめにユーザー名を入力してください</p>}
-        {username && <p>下のボタンを選択してください</p>}
+        {!username && (
+          <p>
+            はじめに名前を
+            <br />
+            入力してね!
+          </p>
+        )}
+        {username && <p>ロビーを作る？入る？</p>}
       </div>
       <input
         type="text"
