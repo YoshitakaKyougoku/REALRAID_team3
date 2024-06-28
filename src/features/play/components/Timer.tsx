@@ -12,7 +12,6 @@ const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
   const [progressBarClass, setProgressBarClass] = useState(
     styles.progressBarInfo
   );
-  const headerRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     // 残り時間をリセット
@@ -52,11 +51,13 @@ const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
   }, [timeLeft, totalTime, sendMessage]);
 
   return (
-    <div className={styles.progress}>
-      <div
-        className={`${styles.progressBar} ${progressBarClass}`}
-        style={{ width: `${progressWidth}%` }}
-      ></div>
+    <div className={styles.center}>
+      <div className={styles.progress}>
+        <div
+          className={`${styles.progressBar} ${progressBarClass}`}
+          style={{ width: `${progressWidth}%` }}
+        ></div>
+      </div>
     </div>
   );
 };
