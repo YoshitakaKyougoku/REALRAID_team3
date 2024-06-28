@@ -1,5 +1,6 @@
 import React from "react";
 import UserTable from "./UserTable";
+import styles from './ShowCurrentPlayer.module.css'
 
 interface ShowCurrentPlayerProps {
   lobbyId: string;
@@ -14,15 +15,15 @@ const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
   startGame,
 }) => {
   return (
-    <div>
-      <h2>ロビーID: {lobbyId}</h2>
+    <div className={styles.container}>
+      <h2 className={styles.id}>ロビーID: {lobbyId}</h2>
       <UserTable />
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className={styles.button}
         onClick={startGame}
         disabled={userNumber !== 1}
       >
-        ゲーム開始
+        ゲーム開始！
       </button>
     </div>
   );
