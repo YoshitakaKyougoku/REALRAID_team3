@@ -205,6 +205,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   }
 
   if (gameStarted && !isMyTurn) {
+    getCurrentPlayer()
     return (
       <LobbyContext.Provider
         value={{
