@@ -11,7 +11,7 @@ const CreateLobby: FC<CreateLobbyProps> = ({ username }) => {
   const router = useRouter();
 
   const createLobby = () => {
-    const newLobbyId = Math.random().toString(36).substring(2, 7);
+    const newLobbyId = Math.random().toString(36).substring(2, 5);
     if (username) {
       router.push(
         `/lobby/${newLobbyId}?userName=${encodeURIComponent(username)}`
