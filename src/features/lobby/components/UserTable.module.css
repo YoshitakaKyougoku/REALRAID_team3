@@ -1,4 +1,5 @@
-/* TableStyles.module.css */
+/* UserTable.module.css */
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -7,31 +8,56 @@
   text-align: left;
 }
 
-.table thead tr {
-  background-color: #009879;
-  color: #ffffff;
-  text-align: left;
-  font-weight: bold;
-}
-
 .table th,
 .table td {
   padding: 12px 15px;
 }
 
-.table tbody tr {
-  border-bottom: 1px solid #dddddd;
+.table thead th {
+  background-color: #6c7ae0;
+  color: #ffffff;
+  text-align: center;
 }
 
-.table tbody tr:nth-of-type(even) {
-  background-color: #f3f3f3;
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
-.table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
+.table th {
+  background-color: #6c7ae0;
+  color: white;
 }
 
-.table tbody tr.active-row {
-  font-weight: bold;
-  color: #009879;
+.table tr {
+  transition: background-color 0.3s ease;
+}
+
+.table tr td {
+  text-align: center;
+}
+
+.table_container {
+  background-color: #282c34;
+  border-radius: 8px;
+  padding: 20px;
+  color: white;
+  font-family: "Arial", sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.user_row {
+  border-bottom: 1px solid #444;
+  color: #ffffff;
+}
+
+.user_row:hover {
+  background-color: #3a3f47;
 }

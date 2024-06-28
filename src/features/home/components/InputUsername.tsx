@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './InputUsername.module.css';
-import { RiH3 } from 'react-icons/ri';
+import { FC } from "react";
+import styles from "./InputUsername.module.css";
 
 type InputUsernameProps = {
   username: string;
   setUsername: (username: string) => void;
 };
 
-const InputUsername = ({username,setUsername}:InputUsernameProps) => {
-  const router = useRouter();
-
+const InputUsername: FC<InputUsernameProps> = ({
+  username,
+  setUsername,
+}: InputUsernameProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        {!username && (<p>はじめにユーザー名を入力してください</p>)}
-        {username && (<p>下のボタンを選択してください</p>)}
+        {!username && <p>はじめにユーザー名を入力してください</p>}
+        {username && <p>下のボタンを選択してください</p>}
       </div>
       <input
         type="text"
