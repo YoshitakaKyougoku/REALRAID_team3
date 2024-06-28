@@ -18,7 +18,7 @@ export const GameResult = ({
 }: GameResultProps) => {
   return (
     <div className={styles.container}>
-      <Link href="/">トップに戻る</Link>
+      <Link className={styles.link} href="/">トップに戻る</Link>
       <p className={styles.point}>ChatGPTによる採点：{chatgpt}/10point</p>
       <div className={styles.results}>
         <p className={styles.heading}>お題</p>
