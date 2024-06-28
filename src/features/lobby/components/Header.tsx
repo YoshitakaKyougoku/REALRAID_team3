@@ -10,9 +10,6 @@ const Header = () => {
         <ExitLobby ws={null} userNumber={null} />
       </div>
       <div className={styles.title}>Knock Prompt</div>
-      <div className={styles.icon}>
-        <FiHelpCircle />
-      </div>
     </header>
   );
 };
