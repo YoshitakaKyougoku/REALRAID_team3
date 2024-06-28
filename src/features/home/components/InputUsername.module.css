@@ -5,19 +5,19 @@
   width: 320px;
 }
 
-.title{
+.title {
   font-size: auto;
   font-weight: bold;
   text-align: center;
   margin: 32px 0;
-
 }
 
 .input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: calc(100% - 18px); 
+  width: calc(100% - 18px);
   box-sizing: border-box;
-  }
-  
+  font-size: 16px;
+  transform: scale(0.8);
+}
