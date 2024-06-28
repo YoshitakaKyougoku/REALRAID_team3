@@ -10,13 +10,13 @@ type AnswerInputProps = {
 const AnswerInput = ({ input, setInput, onSend }: AnswerInputProps) => {
   return (
     <div className={styles.container}>
-      <h3>プロンプトを入力してください！</h3>
+      {/* <p>プロンプトを入力してください！</p> */}
       <textarea
         className={styles.textarea}
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button className={styles.button} onClick={onSend}>送信</button>
+      {/* <button className={styles.button} onClick={onSend}>送信</button> */}
     </div>
   );
 };

@@ -7,8 +7,8 @@ export const ShowImage = ({ imageData }: ShowImageProps) => {
     <Image
       src={`data:image/png;base64,${imageData}`}
       alt="Received Data"
-      width={300}
-      height={300}
+      width={250}
+      height={250}
     />
   );
 };
