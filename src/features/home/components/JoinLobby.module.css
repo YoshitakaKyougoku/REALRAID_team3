@@ -42,20 +42,18 @@
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 16px;
+  transform: scale(0.8);
 }
 
 .button {
-  background-color: #4caf50;
+  background-color: #1be8ee;
   color: white;
   padding: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
-}
-
-.button:hover {
-  background-color: #45a049;
 }
 
 @media (max-width: 600px) {
