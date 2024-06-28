@@ -5,18 +5,17 @@
   justify-content: space-between;
   align-items: center;
   background-color: #f8f9fa;
+  height: 48px;
 }
 
 .icon {
-  font-size: 48px;
-  color: #495057;
+  margin-right: 24px;
 }
 
 .title {
   font-size: 18px;
   font-weight: bold;
   font-family: "Press Start 2P", cursive;
-
   color: #495057;
   text-align: center;
   flex: 1;
@@ -24,11 +23,12 @@
 
 @media (max-width: 768px) {
   .header {
+    height: 32px;
     padding: 10px;
   }
 
   .icon {
-    font-size: 20px;
+    margin-right: 8px;
   }
 
   .title {
