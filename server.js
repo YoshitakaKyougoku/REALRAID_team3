@@ -76,20 +76,20 @@ wss.on("connection", (ws) => {
       }
     } else if (parsedMessage.type === "startGame" && currentLobby) {
       const lobby = lobbies[currentLobby];
-      const initialPrompt = await generatePrompt();
-      lobby.originalMessage = initialPrompt;
-      console.log(initialPrompt);
-      const translatedPrompt = await translate(initialPrompt);
-      console.log(translatedPrompt);
-      const imageData = await generateImage(translatedPrompt);
       if (lobby.clients[0].ws === ws) {
         lobby.clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
-        lobby.clients.forEach((client) => {
+        lobby.clients.forEach(async (client) => {
           client.ws.send(
             JSON.stringify({ type: "gameStarted", payload: true })
           );
+          const initialPrompt = await generatePrompt();
+          lobby.originalMessage = initialPrompt;
+          console.log(initialPrompt);
+          const translatedPrompt = await translate(initialPrompt);
+          console.log(translatedPrompt);
+          const imageData = await generateImage(translatedPrompt);
           client.ws.send(
             JSON.stringify({ type: "initialImage", payload: imageData })
           );
