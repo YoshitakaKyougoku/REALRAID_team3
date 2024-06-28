@@ -148,11 +148,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   }
 
   if (error) {
-    return (
-      <div>
-        <Error error={error} />
-      </div>
-    );
+    return <Error error={error} />;
   }
 
   if (showChangeNextUser && timeChangeNextPlayer > 0) {
@@ -167,7 +163,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   if (isMyTurn) {
     return (
       <div>
-        <Timer userName={userName} totalTime={15} sendMessage={sendMessage} />
+        <Timer totalTime={10} sendMessage={sendMessage} />
         <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
       </div>
     );
@@ -203,7 +199,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     >
       <Header />
       <ShowCurrentPlayer
-        lobbyId={lobbyId} 
+        lobbyId={lobbyId}
         users={users}
         userNumber={userNumber}
         startGame={startGame}

@@ -19,9 +19,7 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
         />
       </head>
-      <body className={styles.body}>
-        {children}
-      </body>
+      <body className={styles.body}>{children}</body>
     </html>
   );
 }
