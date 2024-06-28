@@ -21,7 +21,7 @@ const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
       <h2 className={styles.id}>ロビーID: {lobbyId}</h2>
       <UserTable />
       <button
-        className={styles.button}
+        className={userNumber === 1?styles.button:styles.disabledButton}
         onClick={startGame}
         disabled={userNumber !== 1}
       >

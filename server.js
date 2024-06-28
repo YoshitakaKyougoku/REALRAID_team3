@@ -80,16 +80,18 @@ wss.on("connection", (ws) => {
         lobby.clients[0].ws.send(
           JSON.stringify({ type: "turn", payload: true })
         );
-        lobby.clients.forEach(async (client) => {
+        lobby.clients.forEach((client) => {
           client.ws.send(
             JSON.stringify({ type: "gameStarted", payload: true })
           );
-          const initialPrompt = await generatePrompt();
-          lobby.originalMessage = initialPrompt;
-          console.log(initialPrompt);
-          const translatedPrompt = await translate(initialPrompt);
-          console.log(translatedPrompt);
-          const imageData = await generateImage(translatedPrompt);
+        });
+        const initialPrompt = await generatePrompt();
+        lobby.originalMessage = initialPrompt;
+        console.log(initialPrompt);
+        const translatedPrompt = await translate(initialPrompt);
+        console.log(translatedPrompt);
+        const imageData = await generateImage(translatedPrompt);
+        lobby.clients.forEach((client) => {
           client.ws.send(
             JSON.stringify({ type: "initialImage", payload: imageData })
           );
@@ -149,9 +151,11 @@ wss.on("connection", (ws) => {
             });
           } else {
             const nextClient = lobby.clients[lobby.currentTurn];
-            nextClient.ws.send(
-              JSON.stringify({ type: "generatedImage", payload: imageData })
-            );
+            lobby.clients.forEach((client) => {
+              client.ws.send(
+                JSON.stringify({ type: "generatedImage", payload: imageData })
+              );
+            });
             nextClient.ws.send(JSON.stringify({ type: "turn", payload: true }));
             nextClient.ws.send(
               JSON.stringify({

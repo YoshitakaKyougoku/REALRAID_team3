@@ -22,3 +22,17 @@
   padding: 10px;
   height: 60px;
 }
+.disabledButton {
+    margin-top: auto;
+    background-color: white;
+    color: #f0f0f0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 20rem;
+    border: 1px #f0f0f0 solid;
+    font-size: 20px;
+    padding: 10px;
+    height: 60px;
+  }

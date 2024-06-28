@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, createContext } from "react";
 
 export const LobbyContext = createContext<{
     users: string[];
+    setUsers: Dispatch<SetStateAction<string[]>>;
     isMyTurn: boolean;
     setIsMyTurn: Dispatch<SetStateAction<boolean>>;
     sendMessage: () => void;
@@ -10,6 +11,7 @@ export const LobbyContext = createContext<{
   }>(
     {} as {
       users: string[];
+      setUsers: Dispatch<SetStateAction<string[]>>;
       isMyTurn: boolean;
       setIsMyTurn: Dispatch<SetStateAction<boolean>>;
       sendMessage: () => void;

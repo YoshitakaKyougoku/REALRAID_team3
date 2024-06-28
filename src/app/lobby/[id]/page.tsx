@@ -15,6 +15,7 @@ import { LobbyContext } from "@/provider/lobby";
 import { ShowImage } from "@/features/play/components/ShowImage";
 import { GameResult } from "@/features/play/components/GameResult";
 import styles from "./lobbyPage.module.css";
+import { WaitingGenerateImage } from "@/features/play/components/WaitingGenerateImage";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
@@ -117,6 +118,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     if (ws.current && input && isMyTurn) {
       ws.current.send(JSON.stringify({ type: "message", payload: input }));
       setInput("");
+      setGeneratedImage("");
       setIsMyTurn(false);
     }
   };
@@ -153,24 +155,29 @@ export default function LobbyPlay({ params }: { params: any }) {
     );
   }
 
-  if (showChangeNextUser && timeChangeNextPlayer > 0) {
-    return (
-      <ChangeNextUser
-        timeChangeNextPlayer={timeChangeNextPlayer}
-        currentPlayer={currentPlayer}
-      />
-    );
+  if (
+    (showChangeNextUser && initialImage === "") ||
+    (showChangeNextUser && generatedImage === "") ||
+    (gameStarted && generatedImage === "" && !isMyTurn) ||
+    (gameStarted && initialImage === "")
+  ) {
+    return <WaitingGenerateImage />;
   }
+
+  // if (showChangeNextUser && timeChangeNextPlayer > 0) {
+  //   return (
+  //     <ChangeNextUser
+  //       timeChangeNextPlayer={timeChangeNextPlayer}
+  //       currentPlayer={currentPlayer}
+  //     />
+  //   );
+  // }
 
   if (isMyTurn) {
     return (
       <div className={styles.myTurnContainer}>
         <div>
-          <Timer
-            userName={userName}
-            totalTime={10}
-            sendMessage={sendMessage}
-          />
+          <Timer userName={userName} totalTime={10} sendMessage={sendMessage} />
         </div>
         <div className={styles.answer}>
           <div className={styles.imageContainer}>
@@ -202,6 +209,7 @@ export default function LobbyPlay({ params }: { params: any }) {
       <LobbyContext.Provider
         value={{
           users,
+          setUsers,
           isMyTurn,
           setIsMyTurn,
           sendMessage,
@@ -218,6 +226,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     <LobbyContext.Provider
       value={{
         users,
+        setUsers,
         isMyTurn,
         setIsMyTurn,
         sendMessage,
