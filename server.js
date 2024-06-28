@@ -3,7 +3,23 @@ const { createServer } = require("http");
 const { generateImage } = require("./imageGenerator");
 const { generateAnswer, translate, generatePrompt } = require("./chatgpt");
 
-const server = createServer();
+const server = createServer((req, res) => {
+  // CORSヘッダーを追加
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // OPTIONSリクエストに対するレスポンス
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  // 他のリクエストに対するレスポンス
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('WebSocket server is running.');
+});
 const wss = new WebSocketServer({ server });
 
 const lobbies = {};
