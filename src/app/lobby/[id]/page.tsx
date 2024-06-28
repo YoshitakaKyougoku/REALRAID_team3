@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { LobbyContext } from "@/provider/lobby";
 import { ShowImage } from "@/features/play/components/ShowImage";
 import { GameResult } from "@/features/play/components/GameResult";
+import styles from "./lobbyPage.module.css";
 
 export default function LobbyPlay({ params }: { params: any }) {
   const lobbyId = params.id;
@@ -163,22 +164,30 @@ export default function LobbyPlay({ params }: { params: any }) {
 
   if (isMyTurn) {
     return (
-      <div>
-        <Timer userName={userName} totalTime={15} sendMessage={sendMessage} />
-        <p>画像からプロンプトを予想して入力しましょう</p>
-        <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
-        {initialImage && !previousMessage && (
-          <>
-            <p>お題</p>
-            <ShowImage imageData={initialImage} />
-          </>
-        )}
-        {initialImage && previousMessage && (
-          <>
-            <p>生成された画像</p>
-            <ShowImage imageData={generatedImage} />
-          </>
-        )}
+      <div className={styles.myTurnContainer}>
+        <Timer userName={userName} totalTime={600} sendMessage={sendMessage} />
+        <div className={styles.answer}>
+          <p>画像からプロンプトを予想して入力しましょう</p>
+          <AnswerInput input={input} setInput={setInput} onSend={sendMessage} />
+          <div className={styles.imageContainer}>
+            {initialImage && !previousMessage && (
+              <>
+                <p className={styles.imageContainerText}>お題</p>
+                <div className={styles.gameImage}>
+                  <ShowImage imageData={initialImage} />
+                </div>
+              </>
+            )}
+            {initialImage && previousMessage && (
+              <>
+                <p className={styles.imageContainerText}>生成された画像</p>
+                <div className={styles.gameImage}>
+                  <ShowImage imageData={generatedImage} />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
@@ -213,7 +222,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     >
       <Header />
       <ShowCurrentPlayer
-        lobbyId={lobbyId} 
+        lobbyId={lobbyId}
         users={users}
         userNumber={userNumber}
         startGame={startGame}
