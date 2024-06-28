@@ -5,6 +5,7 @@
 
 .textarea {
     border: 1px #6c7ae0 solid;
+    height: 60px;
 }
 
 .button {
