@@ -6,25 +6,20 @@ import InputUsername from "@/features/home/components/InputUsername";
 import Header from "@/features/home/components/Header";
 import CreateLobby from "@/features/home/components/CreateLobby";
 import JoinLobby from "@/features/home/components/JoinLobby";
+import Image from "next/image";
+import gameIcon from "@/public/gameIcon.webp";
 
 export default function Home() {
-  const [lobbyId, setLobbyId] = useState("");
   const [username, setUsername] = useState("");
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <Header />
-      </div>
-      <h1 className={styles.title}>伝言ゲーム</h1>
-      <div className={styles.inputContainer}>
+    <div>
+      <Header />
+      <div className={styles.mainContainer}>
+        <Image src={gameIcon} width={100} height={100} alt={""} />
         <InputUsername username={username} setUsername={setUsername} />
-      </div>
-      <div className={styles.buttonContainer}>
-        <div className={styles.button}>
-          <CreateLobby username={username}  />
-        </div>
-        <div className={styles.button}>
+        <div className={styles.buttonContainer}>
+          <CreateLobby username={username} />
           <JoinLobby username={username} />
         </div>
       </div>

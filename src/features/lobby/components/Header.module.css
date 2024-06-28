@@ -1,3 +1,4 @@
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -14,6 +15,7 @@
 
 .title {
   font-size: 18px;
+
   font-weight: bold;
   color: #495057;
   text-align: center;
