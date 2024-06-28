@@ -19,7 +19,7 @@ export const GameResult = ({
   return (
     <div className={styles.container}>
       <Link className={styles.link} href="/">トップに戻る</Link>
-      <p className={styles.point}>ChatGPTによる採点：{chatgpt}/10point</p>
+      <p className={styles.point}>ChatGPTによる採点：{chatgpt}/10</p>
       <div className={styles.results}>
         <p className={styles.heading}>お題</p>
         <p>{initialPrompt}</p>

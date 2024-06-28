@@ -1,24 +1,26 @@
 .container {
-    display: grid;
-    gap: 10px;
+  display: grid;
+  gap: 10px;
 }
 
 .textarea {
-    border: 1px #6c7ae0 solid;
-    height: 60px;
+  border: 1px #6c7ae0 solid;
+  height: 60px;
+  font-size: 16px;
+  transform: scale(0.8);
 }
 
 .button {
-    margin-top: auto;
-    background-color: white;
-    color: #6c7ae0;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-radius: 20rem;
-    border: 1px #6c7ae0 solid;
-    font-size: 20px;
-    padding: 5px;
-    height: 50px;
-  }
+  margin-top: auto;
+  background-color: white;
+  color: #6c7ae0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 20rem;
+  border: 1px #6c7ae0 solid;
+  font-size: 20px;
+  padding: 5px;
+  height: 50px;
+}
