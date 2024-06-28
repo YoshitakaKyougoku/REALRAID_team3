@@ -148,11 +148,7 @@ export default function LobbyPlay({ params }: { params: any }) {
   }
 
   if (error) {
-    return (
-      <div>
-        <Error error={error} />
-      </div>
-    );
+    return <Error error={error} />;
   }
 
   if (
@@ -177,7 +173,7 @@ export default function LobbyPlay({ params }: { params: any }) {
     return (
       <div className={styles.myTurnContainer}>
         <div>
-          <Timer userName={userName} totalTime={10} sendMessage={sendMessage} />
+          <Timer totalTime={10} sendMessage={sendMessage} />
         </div>
         <div className={styles.answer}>
           <div className={styles.imageContainer}>
