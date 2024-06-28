@@ -13,7 +13,7 @@ export default function Home() {
   const [username, setUsername] = useState("");
 
   return (
-    <div>
+    <>
       <Header />
       <div className={styles.mainContainer}>
         <Image src={gameIcon} alt={""} className={styles.image} />
@@ -23,6 +23,6 @@ export default function Home() {
           <JoinLobby username={username} />
         </div>
       </div>
-    </div>
+    </>
   );
 }
