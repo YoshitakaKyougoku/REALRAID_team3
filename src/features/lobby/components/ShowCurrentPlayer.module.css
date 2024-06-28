@@ -1,22 +1,21 @@
 .container {
-    display: grid;
-    gap: 15px;
-    grid-template-rows: 50px 1fr 60px;
-    /* place-items: center; */
-    /* width: 100vw; */
+  display: grid;
+  gap: 15px;
+  grid-template-rows: 50px 1fr 60px;
 }
 
 .id {
-    place-self: center;
+  place-self: center;
 }
 
 .button {
-  background-color: white; 
+  margin-top: auto;
+  background-color: white;
   color: #6c7ae0;
   padding-left: 1rem;
   padding-right: 1rem;
-  padding-top: 0.5rem; 
-  padding-bottom: 0.5rem; 
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   border-radius: 20rem;
   border: 1px #6c7ae0 solid;
   font-size: 20px;
