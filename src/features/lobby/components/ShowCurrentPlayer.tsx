@@ -16,7 +16,7 @@ const ShowCurrentPlayer: React.FC<ShowCurrentPlayerProps> = ({
 }) => {
   return (
     <div className={styles.container}>
-      <h2 className={styles.id}>ロビーID: {lobbyId}</h2>
+      <h2 className={styles.id}>ID: {lobbyId}</h2>
       <UserTable />
       <button
         className={styles.button}
