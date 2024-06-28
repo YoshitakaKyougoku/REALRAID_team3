@@ -16,7 +16,7 @@ export default function Home() {
     <div>
       <Header />
       <div className={styles.mainContainer}>
-        <Image src={gameIcon} width={100} height={100} alt={""} />
+        <Image src={gameIcon} alt={""} className={styles.image} />
         <InputUsername username={username} setUsername={setUsername} />
         <div className={styles.buttonContainer}>
           <CreateLobby username={username} />
