@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from "react";
+import { FC, useState, useEffect } from "react";
 import styles from "./Timer.module.css";
 
 interface TimerProps {
@@ -8,7 +8,7 @@ interface TimerProps {
 
 const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
   const [timeLeft, setTimeLeft] = useState(totalTime);
-  const [progressWidth, setProgressWidth] = useState(100);
+  const [progressHeight, setProgressHeight] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(
     styles.progressBarInfo
   );
@@ -16,7 +16,7 @@ const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
   useEffect(() => {
     // 残り時間をリセット
     setTimeLeft(totalTime);
-    setProgressWidth(100);
+    setProgressHeight(100);
     setProgressBarClass(styles.progressBarInfo);
   }, [totalTime]);
 
@@ -31,13 +31,13 @@ const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
     const interval = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTime = prevTime - 1;
-        const newWidth = (newTime / totalTime) * 100;
+        const newHeight = (newTime / totalTime) * 100;
 
-        setProgressWidth(newWidth);
+        setProgressHeight(newHeight);
 
-        if (newWidth < 20) {
+        if (newHeight < 20) {
           setProgressBarClass(styles.progressBarDanger);
-        } else if (newWidth < 50) {
+        } else if (newHeight < 50) {
           setProgressBarClass(styles.progressBarWarning);
         } else {
           setProgressBarClass(styles.progressBarInfo);
@@ -55,7 +55,7 @@ const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
       <div className={styles.progress}>
         <div
           className={`${styles.progressBar} ${progressBarClass}`}
-          style={{ width: `${progressWidth}%` }}
+          style={{ height: `${progressHeight}%` }}
         ></div>
       </div>
     </div>
