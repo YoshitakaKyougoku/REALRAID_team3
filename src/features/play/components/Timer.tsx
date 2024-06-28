@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import styles from "./Timer.module.css";
 
 interface TimerProps {
-  userName: string | null;
   totalTime: number;
   sendMessage: () => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ userName, totalTime, sendMessage }) => {
+const Timer: FC<TimerProps> = ({ totalTime, sendMessage }) => {
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [progressWidth, setProgressWidth] = useState(100);
   const [progressBarClass, setProgressBarClass] = useState(
     styles.progressBarInfo
   );
+  const headerRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     // 残り時間をリセット
@@ -52,18 +52,11 @@ const Timer: React.FC<TimerProps> = ({ userName, totalTime, sendMessage }) => {
   }, [timeLeft, totalTime, sendMessage]);
 
   return (
-    <div>
-      <span className={styles.center}>
-        {userName} のターンです
-        <br />
-        残り {timeLeft > 0 ? timeLeft : "時間切れ"} 秒
-      </span>
-      <div className={styles.progress}>
-        <div
-          className={`${styles.progressBar} ${progressBarClass}`}
-          style={{ width: `${progressWidth}%` }}
-        ></div>
-      </div>
+    <div className={styles.progress}>
+      <div
+        className={`${styles.progressBar} ${progressBarClass}`}
+        style={{ width: `${progressWidth}%` }}
+      ></div>
     </div>
   );
 };

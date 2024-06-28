@@ -15,14 +15,14 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className={styles.mainContainer}>
+      <main className={styles.mainContainer}>
         <Image src={gameIcon} alt={""} className={styles.image} />
         <InputUsername username={username} setUsername={setUsername} />
         <div className={styles.buttonContainer}>
           <CreateLobby username={username} />
           <JoinLobby username={username} />
         </div>
-      </div>
+      </main>
     </>
   );
 }

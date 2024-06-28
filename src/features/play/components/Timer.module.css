@@ -1,21 +1,15 @@
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-
 .progress {
-  width: 80%;
-  height: 30px;
-  margin: 10px auto;
+  margin-top: 10px;
+  width: 50%;
+  height: 20px;
   background-color: #f3f3f3;
   border-radius: 10px;
   overflow: hidden;
-  margin-top: 10px;
 }
 
 .progressBar {
+  display: flex;
+  align-items: center;
   height: 100%;
   transition: width 1s linear;
 }
