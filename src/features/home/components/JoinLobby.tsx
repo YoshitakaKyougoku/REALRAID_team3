@@ -30,7 +30,11 @@ const JoinLobby = ({ username }: JoinLobbyProps) => {
 
   return (
     <div>
-      {username && <button className={styles.button} onClick={showModal}>ロビーに入る</button>}
+      {username && (
+        <button className={styles.button} onClick={showModal}>
+          ロビーに入る
+        </button>
+      )}
       {modalOpen && (
         <div className={styles.modal} onClick={hideModal}>
           <div className={styles.modalContent}>
@@ -41,7 +45,7 @@ const JoinLobby = ({ username }: JoinLobbyProps) => {
               placeholder="ロビーIDを入力"
               className={styles.input}
             />
-            <button className={styles.button} onClick={joinLobby}>
+            <button className={styles.joinButton} onClick={joinLobby}>
               参加する
             </button>
           </div>

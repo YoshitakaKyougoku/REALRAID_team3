@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { FC, useState } from "react";
 import styles from "./CreateLobby.module.css";
 import { useRouter } from "next/navigation";
 
@@ -6,7 +6,7 @@ type CreateLobbyProps = {
   username: string;
 };
 
-const CreateLobby = ({ username }: CreateLobbyProps) => {
+const CreateLobby: FC<CreateLobbyProps> = ({ username }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
@@ -40,7 +40,7 @@ const CreateLobby = ({ username }: CreateLobbyProps) => {
         <div className={styles.modal} onClick={hideModal}>
           <div className={styles.modalContent}>
             <h3 className={styles.title}>ロビーを作成しますか？</h3>
-            <button className={styles.button} onClick={createLobby}>
+            <button className={styles.createButton} onClick={createLobby}>
               作成する
             </button>
           </div>

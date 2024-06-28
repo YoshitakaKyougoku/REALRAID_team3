@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import styles from "./layout.module.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +19,9 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
         />
       </head>
-      <body>{children}</body>
+      <body className={styles.body}>
+        {children}
+      </body>
     </html>
   );
 }
